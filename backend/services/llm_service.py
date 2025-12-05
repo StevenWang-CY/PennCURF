@@ -17,6 +17,247 @@ class LLMService:
         )
         self.deployment_name = os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME")
 
+    def _extract_query_terms(self, query: str) -> Dict[str, Any]:
+        """Extract terms and semantic context from query for soft matching"""
+        import re
+
+        # Common stop words to ignore
+        stop_words = {
+            'i', 'want', 'to', 'work', 'on', 'in', 'a', 'an', 'the', 'and', 'or',
+            'for', 'with', 'that', 'is', 'are', 'be', 'been', 'being', 'have',
+            'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should',
+            'may', 'might', 'must', 'can', 'need', 'like', 'interested', 'interest',
+            'looking', 'find', 'get', 'project', 'research', 'opportunity', 'position',
+            'job', 'internship', 'experience', 'field', 'area', 'related', 'involving',
+            'some', 'any', 'about', 'into', 'more', 'also', 'very', 'just', 'good'
+        }
+
+        # Semantic category mappings (query term → research categories that are relevant)
+        category_mappings = {
+            'software': ['Engineering and Computing'],
+            'programming': ['Engineering and Computing'],
+            'web': ['Engineering and Computing'],
+            'website': ['Engineering and Computing'],
+            'app': ['Engineering and Computing'],
+            'code': ['Engineering and Computing'],
+            'coding': ['Engineering and Computing'],
+            'developer': ['Engineering and Computing'],
+            'development': ['Engineering and Computing'],
+            'computer': ['Engineering and Computing'],
+            'data': ['Engineering and Computing', 'Biomedical Science', 'Mathematics and Applied Mathematics'],
+            'machine': ['Engineering and Computing'],
+            'ml': ['Engineering and Computing'],
+            'ai': ['Engineering and Computing'],
+            'healthcare': ['Biomedical Science', 'Nursing'],
+            'medical': ['Biomedical Science'],
+            'health': ['Biomedical Science', 'Nursing'],
+            'biology': ['Biomedical Science', 'Physical and Natural Sciences'],
+            'chemistry': ['Physical and Natural Sciences'],
+            'physics': ['Physical and Natural Sciences'],
+            'math': ['Mathematics and Applied Mathematics'],
+            'statistics': ['Mathematics and Applied Mathematics'],
+            'economics': ['Business and Economics', 'Social Science'],
+            'business': ['Business and Economics'],
+            'finance': ['Business and Economics'],
+            'psychology': ['Social Science'],
+            'sociology': ['Social Science'],
+            'politics': ['Social Science'],
+            'history': ['Humanities'],
+            'literature': ['Humanities'],
+            'writing': ['Humanities', 'Arts'],
+            'art': ['Arts'],
+            'music': ['Arts'],
+            'design': ['Arts', 'Engineering and Computing'],
+        }
+
+        # Semantic expansion (related terms that should also match)
+        semantic_expansions = {
+            'website': ['web', 'frontend', 'react', 'javascript', 'html', 'ui', 'ux', 'app', 'application', 'interface', 'site'],
+            'web': ['website', 'frontend', 'react', 'javascript', 'html', 'fullstack', 'full-stack', 'app', 'browser'],
+            'software': ['programming', 'developer', 'engineering', 'code', 'coding', 'app', 'application', 'build'],
+            'development': ['developer', 'developing', 'build', 'building', 'create', 'creating', 'implement', 'engineer'],
+            'frontend': ['web', 'react', 'javascript', 'ui', 'ux', 'html', 'css', 'interface', 'design'],
+            'backend': ['server', 'api', 'database', 'python', 'node', 'java', 'infrastructure', 'cloud'],
+            'machine': ['ml', 'ai', 'deep', 'neural', 'learning', 'model', 'algorithm'],
+            'learning': ['ml', 'ai', 'machine', 'neural', 'deep', 'model', 'training'],
+            'ml': ['machine', 'ai', 'deep', 'neural', 'model', 'algorithm', 'prediction'],
+            'ai': ['artificial', 'intelligence', 'machine', 'ml', 'neural', 'deep', 'model', 'gpt', 'llm'],
+            'data': ['analytics', 'analysis', 'science', 'statistics', 'database', 'visualization', 'processing'],
+            'chatbot': ['chat', 'bot', 'conversational', 'nlp', 'gpt', 'llm', 'dialogue', 'assistant'],
+            'nlp': ['natural', 'language', 'processing', 'text', 'chatbot', 'gpt', 'llm', 'linguistic'],
+            'healthcare': ['health', 'medical', 'clinical', 'patient', 'hospital', 'medicine', 'care'],
+            'biology': ['biological', 'biomedical', 'genomics', 'cell', 'molecular', 'genetics'],
+        }
+
+        # Word stems (common suffixes to strip for matching)
+        def get_stem(word):
+            """Simple stemming - strip common suffixes"""
+            suffixes = ['ing', 'tion', 'ment', 'ness', 'able', 'ible', 'ity', 'ous', 'ive', 'er', 'or', 'ist', 'ly', 'ed', 's']
+            for suffix in suffixes:
+                if word.endswith(suffix) and len(word) - len(suffix) >= 3:
+                    return word[:-len(suffix)]
+            return word
+
+        # Tokenize and clean
+        words = re.sub(r'[^\w\s]', ' ', query.lower()).split()
+        terms = [w for w in words if w not in stop_words and len(w) > 2]
+
+        # Get stems
+        stems = set(get_stem(t) for t in terms)
+
+        # Get semantic expansions
+        expanded_terms = set(terms)
+        for term in terms:
+            if term in semantic_expansions:
+                expanded_terms.update(semantic_expansions[term])
+            # Also check stems
+            stem = get_stem(term)
+            for key in semantic_expansions:
+                if get_stem(key) == stem:
+                    expanded_terms.update(semantic_expansions[key])
+
+        # Get relevant categories
+        relevant_categories = set()
+        for term in terms:
+            if term in category_mappings:
+                relevant_categories.update(category_mappings[term])
+            # Check stems too
+            stem = get_stem(term)
+            for key in category_mappings:
+                if get_stem(key) == stem:
+                    relevant_categories.update(category_mappings[key])
+
+        return {
+            'original_terms': terms,
+            'stems': list(stems),
+            'expanded_terms': list(expanded_terms),
+            'relevant_categories': list(relevant_categories),
+        }
+
+    def _soft_score_opportunity(
+        self,
+        opp: Dict[str, Any],
+        query_info: Dict[str, Any],
+        total_opps: int
+    ) -> float:
+        """
+        Calculate a soft relevance score for an opportunity.
+        Uses TF-IDF-like scoring with semantic matching.
+        """
+        import math
+
+        # Get searchable text
+        title = (opp.get("title") or "").lower()
+        desc = (opp.get("description") or opp.get("teaser") or "").lower()
+        mentor = (opp.get("mentor_areas") or "").lower()
+        quals = (opp.get("preferred_qualifications") or "").lower()
+        categories = opp.get("research_categories") or []
+
+        searchable = f"{title} {desc} {mentor} {quals}"
+        searchable_words = set(searchable.split())
+
+        score = 0.0
+
+        # 1. Original term matching (highest weight)
+        for term in query_info['original_terms']:
+            if term in title:
+                score += 5.0  # Title match is very important
+            elif term in searchable:
+                score += 2.0
+
+        # 2. Expanded term matching (medium weight)
+        for term in query_info['expanded_terms']:
+            if term not in query_info['original_terms']:  # Don't double count
+                if term in title:
+                    score += 2.5
+                elif term in searchable:
+                    score += 1.0
+
+        # 3. Stem matching (catches develop/developer/development)
+        for stem in query_info['stems']:
+            if len(stem) >= 4:  # Only match meaningful stems
+                for word in searchable_words:
+                    if word.startswith(stem) and len(word) >= len(stem):
+                        score += 0.5
+                        break
+
+        # 4. Category matching (boosts projects in relevant fields)
+        for cat in categories:
+            if cat in query_info['relevant_categories']:
+                score += 1.5
+
+        # 5. Fuzzy substring matching (catches partial matches)
+        for term in query_info['original_terms']:
+            if len(term) >= 5:
+                # Check if term is a substring of any word in searchable
+                for word in searchable_words:
+                    if len(word) >= 5 and (term in word or word in term):
+                        score += 0.3
+                        break
+
+        return score
+
+    def _soft_prefilter_opportunities(
+        self,
+        opportunities: List[Dict[str, Any]],
+        query: str,
+        max_candidates: int = 60
+    ) -> List[Dict[str, Any]]:
+        """
+        Soft pre-filtering using semantic scoring instead of hard keyword matching.
+        Returns top candidates by soft relevance score.
+        """
+        import random
+
+        # Extract query information
+        query_info = self._extract_query_terms(query)
+        print(f"[LLM] Query analysis: {len(query_info['original_terms'])} terms, {len(query_info['expanded_terms'])} expanded, categories: {query_info['relevant_categories']}")
+
+        # Score all opportunities
+        scored_opps = []
+        for opp in opportunities:
+            score = self._soft_score_opportunity(opp, query_info, len(opportunities))
+            scored_opps.append((score, opp))
+
+        # Sort by score descending
+        scored_opps.sort(key=lambda x: x[0], reverse=True)
+
+        # Get top scored candidates (those with positive scores)
+        top_candidates = []
+        for score, opp in scored_opps:
+            if score > 0:
+                top_candidates.append(opp)
+            if len(top_candidates) >= max_candidates:
+                break
+
+        print(f"[LLM] Found {len(top_candidates)} opportunities with positive relevance scores")
+
+        # If we have very few matches, add diverse random samples
+        if len(top_candidates) < 20:
+            # Add some from relevant categories
+            category_extras = []
+            for score, opp in scored_opps:
+                if opp not in top_candidates:
+                    cats = opp.get("research_categories") or []
+                    if any(c in query_info['relevant_categories'] for c in cats):
+                        category_extras.append(opp)
+                        if len(category_extras) >= 15:
+                            break
+
+            top_candidates.extend(category_extras)
+            print(f"[LLM] Added {len(category_extras)} category-matching extras")
+
+        # Ensure minimum diversity with random sample
+        if len(top_candidates) < 30:
+            remaining = [opp for _, opp in scored_opps if scored_opps[0] not in top_candidates]
+            sample_size = min(30 - len(top_candidates), len(remaining))
+            if sample_size > 0:
+                random_extras = random.sample(remaining, sample_size)
+                top_candidates.extend(random_extras)
+                print(f"[LLM] Added {sample_size} random samples for diversity")
+
+        return top_candidates[:max_candidates]
+
     def semantic_search(
         self,
         query: str,
@@ -28,6 +269,14 @@ class LLMService:
         Use LLM to rank opportunities based on semantic match with query and student profile.
         Returns opportunities with relevance scores.
         """
+        print(f"[LLM] Total opportunities to search: {len(opportunities)}")
+
+        # Use SOFT pre-filtering (semantic scoring, not hard keyword matching)
+        filtered_opportunities = self._soft_prefilter_opportunities(
+            opportunities, query, max_candidates=60
+        )
+        print(f"[LLM] Soft pre-filtered to {len(filtered_opportunities)} candidates")
+
         # Create student context if profile provided
         student_context = ""
         if student_profile:
@@ -41,28 +290,45 @@ Student Profile:
 - Experience: {student_profile.get('experience', 'Not specified')}
 """
 
-        # Create summaries of opportunities (limit to 40 to avoid context overflow)
-        # Using compact format to reduce token usage
+        # Create summaries of opportunities (now from pre-filtered list)
         opportunity_summaries = []
-        for i, opp in enumerate(opportunities[:40]):  # Reduced from 100 to 40
+        for i, opp in enumerate(filtered_opportunities[:50]):  # Send top 50 to LLM
+            # Combine description + mentor_areas + qualifications for better context
+            desc = opp.get("description") or opp.get("teaser") or ""
+            mentor = opp.get("mentor_areas") or ""
+            quals = opp.get("preferred_qualifications") or ""
+            # Combine and truncate to 400 chars total
+            combined = f"{desc[:200]} | Skills: {mentor[:100]} | Looking for: {quals[:100]}"
+
             summary = {
                 "id": str(opp.get("id", "")),
                 "title": opp.get("title", ""),
-                "desc": (opp.get("description") or opp.get("teaser") or "")[:150],  # Reduced from 300
+                "desc": combined,
             }
             opportunity_summaries.append(summary)
 
-        prompt = f"""You are helping match a student with research opportunities.
+        prompt = f"""You are a research opportunity matcher helping students find relevant research positions.
 {student_context}
 Query: "{query}"
 
-Score each opportunity 1-10 based on relevance to the query. Return JSON array with id, score, explanation (10 words max).
-Only include score >= 5. Sort by score descending.
+SCORING GUIDELINES:
+- Score 9-10: The position's MAIN WORK directly matches the query (e.g., "software development" query matches a position building software)
+- Score 7-8: Strong relevance - the query skill/interest is a significant part of the work
+- Score 5-6: Moderate relevance - related field, transferable skills, or partial match
+- DO NOT give 9-10 to positions where the query topic is just a SIDE TASK (e.g., a physics project that incidentally needs a website is NOT a "web development" position)
+
+INTERPRET THE QUERY BROADLY:
+- "website development" → web dev, software engineering, frontend, full-stack, programming, building web apps/tools
+- "machine learning" → ML, AI, deep learning, data science, neural networks
+- "healthcare" → medicine, clinical research, health informatics, biomedical
+- Match RELATED skills and fields, not just exact keyword matches
 
 Opportunities:
 {json.dumps(opportunity_summaries)}
 
-Return ONLY valid JSON array like: [{{"id":"uuid","score":9,"explanation":"reason"}}]"""
+Return opportunities with score >= 5. Include diverse matches that fit the student's interests.
+Return ONLY valid JSON array: [{{"id":"uuid","score":9,"explanation":"brief reason"}}]
+Sort by score descending. Return up to 15 matches."""
 
         try:
             print(f"[LLM] Sending {len(opportunity_summaries)} opportunities for query: {query}")

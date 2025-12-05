@@ -197,21 +197,52 @@ class CURFScraper:
             for section in sections:
                 section_title = section.get_text(strip=True).lower()
 
-                # Get the next sibling paragraph or div
-                next_elem = section.find_next_sibling()
-                if next_elem and next_elem.name in ["p", "div"]:
-                    content = next_elem.get_text(strip=True)
+                # Collect ALL content between this h2 and the next h2/section header
+                # This handles multi-paragraph content properly
+                content_parts = []
+                project_website_link = None
 
-                    if "mentor areas" in section_title:
-                        data["mentor_areas"] = content
-                    elif "description" in section_title:
-                        data["description"] = content
-                    elif "preferred qualifications" in section_title:
-                        data["preferred_qualifications"] = content
-                    elif "project website" in section_title:
-                        link = next_elem.find("a")
-                        if link:
-                            data["project_website"] = link.get("href", "")
+                for sibling in section.find_next_siblings():
+                    # Stop when we hit another section header
+                    if sibling.name in ["h2", "h3"]:
+                        break
+
+                    # Collect text from p, div elements
+                    if sibling.name in ["p", "div"]:
+                        text = sibling.get_text(strip=True)
+                        if text:
+                            content_parts.append(text)
+
+                        # Check for project website link
+                        link = sibling.find("a")
+                        if link and "project website" in section_title:
+                            project_website_link = link.get("href", "")
+
+                    # Collect text from ul/ol list elements
+                    elif sibling.name in ["ul", "ol"]:
+                        list_items = sibling.find_all("li")
+                        for li in list_items:
+                            li_text = li.get_text(strip=True)
+                            if li_text:
+                                content_parts.append(f"• {li_text}")
+
+                # Join all parts with newlines for multi-paragraph content
+                content = "\n\n".join(content_parts)
+
+                if "mentor areas" in section_title:
+                    data["mentor_areas"] = content
+                elif "description" in section_title:
+                    data["description"] = content
+                elif "preferred qualifications" in section_title:
+                    data["preferred_qualifications"] = content
+                elif "project website" in section_title:
+                    if project_website_link:
+                        data["project_website"] = project_website_link
+                    elif content_parts:
+                        # Sometimes the URL is just text
+                        first_link = section.find_next("a")
+                        if first_link:
+                            data["project_website"] = first_link.get("href", "")
 
             # Preferred Student Year
             year_header = soup.find("h3", string=re.compile(r"Preferred Student Year", re.I))

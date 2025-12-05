@@ -1,16 +1,23 @@
 'use client';
 
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function HomePage() {
-  const [profileExists, setProfileExists] = useState(false);
+  const { isAuthenticated, user, isLoading } = useAuth();
 
-  useEffect(() => {
-    // Check if profile exists in localStorage
-    const profileId = localStorage.getItem('studentProfileId');
-    setProfileExists(!!profileId);
-  }, []);
+  // Determine CTA destinations based on auth state
+  const primaryCTA = isAuthenticated
+    ? user?.has_profile
+      ? '/search'
+      : '/profile'
+    : '/auth/register';
+
+  const primaryCTAText = isAuthenticated
+    ? user?.has_profile
+      ? 'Start Searching'
+      : 'Complete Profile'
+    : 'Get Started';
 
   return (
     <div className="space-y-20">
@@ -29,19 +36,27 @@ export default function HomePage() {
             and generate cold emails to connect with faculty instantly.
           </p>
           <div className="flex flex-col sm:flex-row justify-center items-center gap-4 pt-4">
-            <Link
-              href="/search"
-              className="px-8 py-4 bg-white text-[#011F5B] rounded-full font-semibold hover:bg-blue-50 hover:scale-105 transition-all shadow-lg hover:shadow-xl"
-            >
-              Start Searching
-            </Link>
-            {!profileExists && (
-              <Link
-                href="/profile"
-                className="px-8 py-4 bg-white/10 backdrop-blur-sm border border-white/20 text-white rounded-full font-semibold hover:bg-white/20 transition-all"
-              >
-                Create Profile
-              </Link>
+            {isLoading ? (
+              <div className="px-8 py-4 bg-white/20 rounded-full">
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              </div>
+            ) : (
+              <>
+                <Link
+                  href={primaryCTA}
+                  className="px-8 py-4 bg-white text-[#011F5B] rounded-full font-semibold hover:bg-blue-50 hover:scale-105 transition-all shadow-lg hover:shadow-xl"
+                >
+                  {primaryCTAText}
+                </Link>
+                {!isAuthenticated && (
+                  <Link
+                    href="/auth/login"
+                    className="px-8 py-4 bg-white/10 backdrop-blur-sm border border-white/20 text-white rounded-full font-semibold hover:bg-white/20 transition-all"
+                  >
+                    Sign In
+                  </Link>
+                )}
+              </>
             )}
           </div>
         </div>
@@ -54,16 +69,16 @@ export default function HomePage() {
             How It Works
           </h2>
           <p className="text-gray-500 max-w-2xl mx-auto text-lg">
-            Three simple steps to launch your research journey.
+            Four simple steps to launch your research journey.
           </p>
         </div>
 
         <div className="grid md:grid-cols-4 gap-8">
           {[
-            { step: 1, title: 'Create Profile', desc: 'Tell us about your interests and skills.' },
-            { step: 2, title: 'Search Naturally', desc: 'Describe what you want in plain English.' },
-            { step: 3, title: 'Get Matches', desc: 'AI ranks opportunities just for you.' },
-            { step: 4, title: 'Generate Email', desc: 'Draft personalized emails to faculty.' },
+            { step: 1, title: 'Create Account', desc: 'Sign up with your Penn credentials.' },
+            { step: 2, title: 'Build Profile', desc: 'Tell us about your interests and skills.' },
+            { step: 3, title: 'Search Naturally', desc: 'Describe what you want in plain English.' },
+            { step: 4, title: 'Connect', desc: 'Generate personalized emails to faculty.' },
           ].map((item, idx) => (
             <div key={idx} className="group relative bg-white p-8 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow text-center">
               <div className="w-14 h-14 bg-gradient-to-br from-[#011F5B] to-[#003366] text-white rounded-2xl flex items-center justify-center mx-auto mb-6 text-xl font-bold shadow-lg shadow-blue-900/10 group-hover:scale-110 transition-transform">
@@ -144,12 +159,14 @@ export default function HomePage() {
           <p className="text-gray-400 text-lg">
             Join hundreds of students who found their placement through Penn CURF Finder.
           </p>
-          <Link
-            href={profileExists ? "/search" : "/profile"}
-            className="inline-block px-8 py-4 bg-[#990000] hover:bg-red-800 text-white rounded-full font-semibold transition-all shadow-lg hover:shadow-red-900/20 hover:-translate-y-1"
-          >
-            {profileExists ? "Start Searching Now" : "Create Your Profile"}
-          </Link>
+          {!isLoading && (
+            <Link
+              href={primaryCTA}
+              className="inline-block px-8 py-4 bg-[#990000] hover:bg-red-800 text-white rounded-full font-semibold transition-all shadow-lg hover:shadow-red-900/20 hover:-translate-y-1"
+            >
+              {primaryCTAText}
+            </Link>
+          )}
         </div>
       </section>
     </div>

@@ -135,3 +135,35 @@ class SkillAnalysisResponse(BaseModel):
 class FilterOptions(BaseModel):
     research_categories: List[str]
     preferred_student_years: List[str]
+
+
+# ============ Authentication Schemas ============
+
+class UserRegister(BaseModel):
+    username: str
+    password: str
+    confirm_password: str
+    penn_confirmed: bool = False
+
+
+class UserLogin(BaseModel):
+    username: str
+    password: str
+
+
+class UserResponse(BaseModel):
+    id: UUID
+    username: str
+    penn_verified: bool
+    has_profile: bool = False
+    profile_id: Optional[UUID] = None
+    created_at: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
+
+
+class AuthResponse(BaseModel):
+    user: UserResponse
+    token: str
+    message: str

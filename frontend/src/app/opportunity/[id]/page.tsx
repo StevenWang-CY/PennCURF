@@ -4,19 +4,57 @@ import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { api, ResearchOpportunity } from '@/lib/api';
+import { useProfile } from '@/contexts/ProfileContext';
+import ProtectedRoute from '@/components/ProtectedRoute';
 
 interface PageProps {
   params: Promise<{ id: string }>;
 }
 
+// Utility function to clean scraped text that may contain extra "Details:" section
+function cleanScrapedText(text: string | undefined | null): string {
+  if (!text) return '';
+
+  // Remove "Details:" section and everything after common markers
+  const markers = [
+    'Details:',
+    'Preferred Student Year',
+    'VolunteerYes',
+    'VolunteerNo',
+    'PaidYes',
+    'PaidNo',
+    'Work StudyYes',
+    'Work StudyNo',
+    'Researcher',
+  ];
+
+  let cleaned = text;
+  for (const marker of markers) {
+    const idx = cleaned.indexOf(marker);
+    if (idx > 0) {
+      cleaned = cleaned.substring(0, idx);
+    }
+  }
+
+  return cleaned.trim();
+}
+
 export default function OpportunityDetailPage({ params }: PageProps) {
+  return (
+    <ProtectedRoute>
+      <OpportunityDetailContent params={params} />
+    </ProtectedRoute>
+  );
+}
+
+function OpportunityDetailContent({ params }: PageProps) {
   const { id } = use(params);
   const router = useRouter();
+  const { profileId, hasProfile } = useProfile();
   const [opportunity, setOpportunity] = useState<ResearchOpportunity | null>(null);
   const [loading, setLoading] = useState(true);
   const [generatingEmail, setGeneratingEmail] = useState(false);
   const [generatedEmail, setGeneratedEmail] = useState<{ subject: string; body: string } | null>(null);
-  const [hasProfile, setHasProfile] = useState(false);
   const [copied, setCopied] = useState<'email' | 'subject' | 'body' | null>(null);
 
   /* Interactive Email Revision State */
@@ -34,13 +72,9 @@ export default function OpportunityDetailPage({ params }: PageProps) {
         console.error('Error loading opportunity:', err);
         setLoading(false);
       });
-
-    const profileId = localStorage.getItem('studentProfileId');
-    setHasProfile(!!profileId);
   }, [id]);
 
   const handleGenerateEmail = async (isRevision = false) => {
-    const profileId = localStorage.getItem('studentProfileId');
     if (!profileId) {
       alert('Please create a profile first to generate a personalized email.');
       router.push('/profile');
@@ -180,14 +214,14 @@ export default function OpportunityDetailPage({ params }: PageProps) {
               </section>
             )}
 
-            {opportunity.preferred_qualifications && (
+            {opportunity.preferred_qualifications && cleanScrapedText(opportunity.preferred_qualifications) && (
               <section className="pt-6 border-t border-gray-50">
                 <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
                   <div className="w-1 h-6 bg-gray-400 rounded-full"></div>
                   Preferred Qualifications
                 </h2>
                 <div className="prose prose-blue max-w-none text-gray-600 leading-relaxed whitespace-pre-wrap">
-                  {opportunity.preferred_qualifications}
+                  {cleanScrapedText(opportunity.preferred_qualifications)}
                 </div>
               </section>
             )}
@@ -471,11 +505,11 @@ interface SkillAnalyzerProps {
 }
 
 function SkillAnalyzer({ opportunityId }: SkillAnalyzerProps) {
+  const { profileId } = useProfile();
   const [analyzing, setAnalyzing] = useState(false);
   const [result, setResult] = useState<import('@/lib/api').SkillAnalysisResponse | null>(null);
 
   const handleAnalyze = async () => {
-    const profileId = localStorage.getItem('studentProfileId');
     if (!profileId) return;
 
     setAnalyzing(true);

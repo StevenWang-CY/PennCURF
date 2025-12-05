@@ -1,111 +1,179 @@
 # Penn CURF Research Directory
 
-An AI-powered, modern platform designed to revolutionize how University of Pennsylvania students discover, analyze, and apply for research opportunities. By leveraging advanced Large Language Models (LLMs) and a sophisticated user interface, this tool bridges the gap between students' potential and faculty needs.
+An AI-powered platform for University of Pennsylvania students to discover, analyze, and apply for research opportunities. Leveraging LLM-based semantic search and intelligent matching, this tool bridges the gap between students and faculty research positions.
 
-## 🌟 Comprehensive Features
+## Features
 
-### 🔍 Smart Search & Discovery
-*Go beyond keyword matching.*
-- **Natural Language Understanding**: Uses Semantic Search (Vector Embeddings) to understand the *intent* of your query. You can ask, "Find me a lab working on renewable energy using machine learning," and the system will identify relevant projects even if they don't explicitly use those exact words.
-- **Intelligent Ranking**: Results are ranked not just by keyword frequency but by relevance to your query and your profile's academic background.
-- **Advanced Filtering**: Fine-tune your discovery with precision using our "Chip" interface. Filter by:
-    - **Research Category** (Physical Sciences, Humanities, Engineering, etc.)
-    - **Student Year** (Freshman to Senior preferences)
-    - **Compensation** (Paid, Volunteer, Work-Study)
+### Smart Search & Discovery
+- **Natural Language Understanding**: Uses multi-stage semantic search with term expansion, stemming, and category mapping to understand query intent
+- **Soft Pre-filtering**: TF-IDF-like scoring with semantic matching ranks opportunities before LLM refinement
+- **Advanced Filtering**: Filter by research category, student year, and compensation type (paid/volunteer/work-study)
 
-### 📊 Skill Compatibility & Gap Analysis
-*Know where you stand before you apply.*
-- **Automated Requirement Extraction**: The system analyzes complex project descriptions to extract both hard skills (e.g., Python, PCR, Data Analysis) and soft skills (e.g., Leadership, Communication).
-- **Personalized Gap Analysis**: It compares these requirements against your stored Student Profile.
-    - **Your Strengths**: Highlights the skills you already possess that make you a great candidate.
-    - **Skills to Build**: Identifies specific areas for improvement, serving as a roadmap for your learning.
-- **Reasoning-Based Scoring**: Powered by **GPT-5-mini**, the system performs a multi-step reasoning process to assign a compatibility score (0-100), ensuring the assessment is nuanced and accurate rather than a simple checklist match.
+### Skill Compatibility Analysis
+- **Automated Requirement Extraction**: Analyzes project descriptions to extract required technical and soft skills
+- **Gap Analysis**: Compares requirements against your profile to identify strengths and areas for improvement
+- **Compatibility Scoring**: LLM-powered scoring (0-100) with detailed reasoning
 
-### ✉️ AI Cold Email Generator & Editor
-*Draft the perfect outreach in seconds.*
-- **Context-Aware Drafting**: Generates a professional, highly personalized email to the specific professor. It pulls context from:
-    - **The Project**: Mentions specific details from the research abstract to show genuine interest.
-    - **Your Profile**: Connects your specific major, skills, and past experiences to the project's needs.
-- **Interactive AI Revision**: Don't like the first draft? Use the "Revise with AI" feature.
-    - *Example*: "Make the tone more enthusiastic and mention my coursework in Bioethics."
-    - The AI intelligently rewrites the email while maintaining professional formatting.
+### AI Cold Email Generator
+- **Context-Aware Drafting**: Generates personalized emails referencing specific project details and your qualifications
+- **Interactive Revision**: Refine drafts with natural language instructions (e.g., "Make it shorter and more formal")
 
-### 👤 Dynamic Student Profiles
-*Your digital research resume.*
-- **Holistic Representation**: Capture your academic identity including Major, Year, GPA, Skills, Research Interests, and Experience.
-- **Data Persistence**: Profiles are stored securely (via Supabase) and persist across sessions, powering the personalization of search results and email generation.
+### User Authentication
+- **Account System**: Register/login with username and password (Penn student confirmation required)
+- **JWT Authentication**: Secure token-based authentication with 7-day expiration
+- **Profile Binding**: Student profiles are linked to user accounts
 
-### 🎨 Modern "Delicate" UI
-*Designed for clarity and focus.*
-- **Glassmorphism Aesthetic**: A clean, distraction-free interface utilizing blurred backgrounds, soft slate/white color palettes, and subtle gradients.
-- **Responsive Experience**: Optimized for seamless use on laptops, tablets, and mobile devices.
+### Student Profiles
+- Capture major, year, skills, interests, and experience
+- Profiles power personalized search rankings and email generation
 
-## 🛠️ Technology Stack
+## Project Structure
 
-- **Frontend**: 
-    - **Framework**: Next.js 14 (App Router)
-    - **Styling**: Tailwind CSS v3, Radix UI Primitives
-    - **Icons**: Heroicons
-- **Backend**: 
-    - **API**: FastAPI (Python 3.11+)
-    - **Server**: Uvicorn (ASGI)
-    - **Validation**: Pydantic
-- **Database**: 
-    - **Core**: Supabase (PostgreSQL)
-- **Artificial Intelligence**: 
-    - **Provider**: Azure OpenAI Service
-    - **Models**: GPT-4o (Drafting), GPT-5-mini (Reasoning/Analysis)
+```
+PennCURF/
+├── backend/
+│   ├── main.py                 # FastAPI application with all endpoints
+│   ├── models/
+│   │   └── schemas.py          # Pydantic models for API validation
+│   ├── services/
+│   │   ├── llm_service.py      # LLM-powered search, email, and analysis
+│   │   ├── auth_service.py     # JWT authentication and password hashing
+│   │   └── supabase_service.py # Database operations
+│   └── scraper/
+│       └── curf_scraper.py     # CURF directory web scraper
+├── frontend/
+│   └── src/
+│       ├── app/
+│       │   ├── page.tsx            # Landing page
+│       │   ├── search/page.tsx     # Search interface
+│       │   ├── profile/page.tsx    # Profile management
+│       │   ├── opportunity/[id]/   # Opportunity detail view
+│       │   └── auth/               # Login and registration
+│       ├── components/
+│       │   ├── NavBar.tsx          # Navigation component
+│       │   └── ProtectedRoute.tsx  # Auth route guard
+│       ├── contexts/
+│       │   ├── AuthContext.tsx     # Authentication state
+│       │   └── ProfileContext.tsx  # Profile state
+│       └── lib/
+│           └── api.ts              # API client functions
+└── .env.example                    # Environment variables template
+```
 
-## 🚀 Getting Started
+## Technology Stack
+
+### Frontend
+- **Framework**: Next.js 14 (App Router)
+- **Styling**: Tailwind CSS v3
+- **State**: React Context API
+- **Icons**: Heroicons
+
+### Backend
+- **API**: FastAPI (Python 3.11+)
+- **Server**: Uvicorn (ASGI)
+- **Validation**: Pydantic v2
+- **Auth**: python-jose (JWT), passlib (bcrypt)
+
+### Database
+- **Core**: Supabase (PostgreSQL)
+
+### AI
+- **Provider**: Azure OpenAI Service
+- **Model**: GPT-4o-mini (configurable)
+
+## API Endpoints
+
+### Authentication
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/auth/register` | Create new account |
+| POST | `/api/auth/login` | Login and get JWT token |
+| POST | `/api/auth/logout` | Logout (client discards token) |
+| GET | `/api/auth/me` | Get current user info |
+| GET | `/api/auth/profile` | Get authenticated user's profile |
+| POST | `/api/auth/profile` | Create profile for current user |
+| PATCH | `/api/auth/profile` | Update current user's profile |
+
+### Opportunities
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/opportunities` | List opportunities with filters |
+| GET | `/api/opportunities/{id}` | Get single opportunity |
+| GET | `/api/filter-options` | Get available filter values |
+
+### Search & Analysis
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/search` | Semantic search with LLM ranking |
+| POST | `/api/analyze-skills` | Get skill compatibility analysis |
+| POST | `/api/generate-email` | Generate or revise cold email |
+
+### Saved Opportunities
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/saved/{student_id}/{opp_id}` | Save opportunity |
+| DELETE | `/api/saved/{student_id}/{opp_id}` | Remove saved |
+| GET | `/api/saved/{student_id}` | Get all saved |
+
+## Getting Started
 
 ### Prerequisites
 - Node.js (v18+)
 - Python (v3.11+)
-- Anaconda (optional, recommended for environment management)
+
+### Environment Setup
+
+Copy `.env.example` to `.env` and configure:
+
+```bash
+# Azure OpenAI
+AZURE_OPENAI_API_KEY=your_key
+AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com/
+AZURE_OPENAI_API_VERSION=2025-01-01-preview
+AZURE_OPENAI_DEPLOYMENT_NAME=gpt-4o-mini
+
+# Supabase
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_ANON_KEY=your_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+
+# JWT (generate a secure random key for production)
+JWT_SECRET_KEY=your-secret-key-change-in-production
+
+# CURF Session (for scraping - get from browser after logging in)
+CURF_SESSION_COOKIE=your_session_cookie
+```
 
 ### Backend Setup
-1. Navigate to the backend directory:
-   ```bash
-   cd backend
-   ```
-2. Create and activate a virtual environment (if not using Conda):
-   ```bash
-   python -m venv .venv
-   source .venv/bin/activate  # On Mac/Linux
-   ```
-3. Install dependencies:
-   ```bash
-   # Ensure you are using the virtual environment's pip
-   python -m pip install -r requirements.txt
-   ```
-4. Start the server:
-   ```bash
-   python main.py
-   ```
-   The API will run at `http://localhost:8000`.
+```bash
+cd backend
+python -m venv .venv
+source .venv/bin/activate  # On Mac/Linux
+pip install -r requirements.txt
+python main.py
+```
+API runs at `http://localhost:8000`.
 
 ### Frontend Setup
-1. Navigate to the frontend directory:
-   ```bash
-   cd frontend
-   ```
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Start the development server:
-   ```bash
-   npm run dev
-   ```
-   The app will run at `http://localhost:3000`.
+```bash
+cd frontend
+npm install
+npm run dev
+```
+App runs at `http://localhost:3000`.
 
-## 🧪 Verification Workflow
+### Data Scraping (Optional)
+To populate the database with CURF opportunities:
+```bash
+cd backend
+python scraper/curf_scraper.py
+```
+Requires valid `CURF_SESSION_COOKIE` from an authenticated Penn browser session.
 
-To verify the installation and features:
-1. **Initialize**: Open `http://localhost:3000`.
-2. **Profile**: Go to **My Profile** and create a detailed profile (add skills like "Python", "React").
-3. **Search**: Use the **"AI Search"** bar to find "coding projects". Verify semantic results.
-4. **Analysis**: Click an opportunity. Hit **"Analyze My Fit"**. 
-    - *Expected*: A gauge showing score, and lists of "Strengths" vs "Skills to Build".
-5. **Outreach**: Scroll to **"Generate Cold Email"**.
-    - *Expected*: A draft appears. Click **"Revise"** and ask to "Make it shorter". Verify the update.
+## Verification Workflow
+
+1. **Register**: Create an account at `/auth/register`
+2. **Profile**: Complete your profile at `/profile`
+3. **Search**: Use natural language queries like "machine learning in healthcare"
+4. **Analyze**: Click an opportunity and use "Analyze My Fit" to see compatibility
+5. **Email**: Generate a cold email and refine it with revision instructions

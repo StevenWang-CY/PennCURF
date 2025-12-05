@@ -1,5 +1,11 @@
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
+// Helper to get auth token
+function getAuthToken(): string | null {
+  if (typeof window === 'undefined') return null;
+  return localStorage.getItem('auth_token');
+}
+
 // Types
 export interface ResearchOpportunity {
   id: string;
@@ -65,13 +71,23 @@ export interface FilterOptions {
 }
 
 // API Functions
-async function fetchAPI<T>(endpoint: string, options?: RequestInit): Promise<T> {
+async function fetchAPI<T>(endpoint: string, options?: RequestInit & { auth?: boolean }): Promise<T> {
+  const headers: HeadersInit = {
+    'Content-Type': 'application/json',
+    ...options?.headers,
+  };
+
+  // Add auth token if auth is required (default: true for most endpoints)
+  if (options?.auth !== false) {
+    const token = getAuthToken();
+    if (token) {
+      (headers as Record<string, string>)['Authorization'] = `Bearer ${token}`;
+    }
+  }
+
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
     ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...options?.headers,
-    },
+    headers,
   });
 
   if (!response.ok) {
@@ -220,6 +236,25 @@ export interface SkillAnalysisResponse {
   analysis_text?: string;
 }
 
+// Auth Profile Functions (for authenticated users)
+export async function getMyProfile(): Promise<StudentProfile> {
+  return fetchAPI('/api/auth/profile');
+}
+
+export async function createMyProfile(profile: StudentProfileCreate): Promise<StudentProfile> {
+  return fetchAPI('/api/auth/profile', {
+    method: 'POST',
+    body: JSON.stringify(profile),
+  });
+}
+
+export async function updateMyProfile(updates: Partial<StudentProfile>): Promise<StudentProfile> {
+  return fetchAPI('/api/auth/profile', {
+    method: 'PATCH',
+    body: JSON.stringify(updates),
+  });
+}
+
 // Unified API object for easier imports
 export const api = {
   // Opportunities
@@ -230,10 +265,15 @@ export const api = {
   // Search
   search: searchOpportunities,
 
-  // Student Profiles
+  // Student Profiles (legacy - for backward compatibility)
   createStudentProfile,
   getStudentProfile,
   updateStudentProfile,
+
+  // Auth Profile (for authenticated users)
+  getMyProfile,
+  createMyProfile,
+  updateMyProfile,
 
   // Email
   generateEmail,

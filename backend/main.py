@@ -1,5 +1,6 @@
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, Depends, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from typing import List, Optional
 from uuid import UUID
 import os
@@ -18,9 +19,14 @@ from models.schemas import (
     SkillAnalysisRequest,
     SkillAnalysisResponse,
     FilterOptions,
+    UserRegister,
+    UserLogin,
+    UserResponse,
+    AuthResponse,
 )
 from services.supabase_service import get_supabase_service
 from services.llm_service import get_llm_service
+from services.auth_service import get_auth_service
 
 # Load environment variables
 load_dotenv()
@@ -41,6 +47,38 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Security
+security = HTTPBearer(auto_error=False)
+
+
+# Auth dependency - extracts and validates token
+async def get_current_user(
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security),
+) -> Optional[dict]:
+    """Get current user from JWT token (returns None if not authenticated)"""
+    if not credentials:
+        return None
+
+    auth = get_auth_service()
+    user_data = auth.verify_token(credentials.credentials)
+    return user_data
+
+
+async def require_auth(
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security),
+) -> dict:
+    """Require authentication - raises 401 if not authenticated"""
+    if not credentials:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+
+    auth = get_auth_service()
+    user_data = auth.verify_token(credentials.credentials)
+
+    if not user_data:
+        raise HTTPException(status_code=401, detail="Invalid or expired token")
+
+    return user_data
+
 
 # ============ Health Check ============
 @app.get("/")
@@ -51,6 +89,225 @@ async def root():
 @app.get("/health")
 async def health_check():
     return {"status": "healthy"}
+
+
+# ============ Authentication ============
+@app.post("/api/auth/register", response_model=AuthResponse)
+async def register(data: UserRegister):
+    """Register a new user account"""
+    try:
+        auth = get_auth_service()
+        db = get_supabase_service()
+
+        # Validate Penn confirmation
+        if not data.penn_confirmed:
+            raise HTTPException(
+                status_code=400,
+                detail="You must confirm that you are a Penn student with a valid PennKey"
+            )
+
+        # Validate username
+        is_valid, error_msg = auth.validate_username(data.username)
+        if not is_valid:
+            raise HTTPException(status_code=400, detail=error_msg)
+
+        # Validate password
+        is_valid, error_msg = auth.validate_password_strength(data.password)
+        if not is_valid:
+            raise HTTPException(status_code=400, detail=error_msg)
+
+        # Check passwords match
+        if data.password != data.confirm_password:
+            raise HTTPException(status_code=400, detail="Passwords do not match")
+
+        # Check if username already exists
+        existing_user = db.get_user_by_username(data.username)
+        if existing_user:
+            raise HTTPException(status_code=400, detail="Username already taken")
+
+        # Create user account
+        password_hash = auth.hash_password(data.password)
+        user = db.create_user_account(data.username, password_hash, data.penn_confirmed)
+
+        if not user:
+            raise HTTPException(status_code=500, detail="Failed to create account")
+
+        # Create JWT token
+        token = auth.create_access_token(str(user["id"]), user["username"])
+
+        return AuthResponse(
+            user=UserResponse(
+                id=user["id"],
+                username=user["username"],
+                penn_verified=user["penn_verified"],
+                has_profile=False,
+                profile_id=None,
+                created_at=user.get("created_at"),
+            ),
+            token=token,
+            message="Account created successfully",
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Registration error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/auth/login", response_model=AuthResponse)
+async def login(data: UserLogin):
+    """Login with username and password"""
+    try:
+        auth = get_auth_service()
+        db = get_supabase_service()
+
+        # Get user
+        user = db.get_user_by_username(data.username)
+        if not user:
+            raise HTTPException(status_code=401, detail="Invalid username or password")
+
+        # Verify password
+        if not auth.verify_password(data.password, user["password_hash"]):
+            raise HTTPException(status_code=401, detail="Invalid username or password")
+
+        # Check if user has a profile
+        profile = db.get_profile_by_user_id(user["id"])
+        has_profile = profile is not None
+        profile_id = profile["id"] if profile else None
+
+        # Create JWT token
+        token = auth.create_access_token(str(user["id"]), user["username"])
+
+        return AuthResponse(
+            user=UserResponse(
+                id=user["id"],
+                username=user["username"],
+                penn_verified=user["penn_verified"],
+                has_profile=has_profile,
+                profile_id=profile_id,
+                created_at=user.get("created_at"),
+            ),
+            token=token,
+            message="Login successful",
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Login error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/auth/logout")
+async def logout():
+    """Logout (client should discard the token)"""
+    return {"message": "Logged out successfully"}
+
+
+@app.get("/api/auth/me", response_model=UserResponse)
+async def get_me(current_user: dict = Depends(require_auth)):
+    """Get current user info"""
+    try:
+        db = get_supabase_service()
+
+        user = db.get_user_by_id(current_user["user_id"])
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+
+        # Check if user has a profile
+        profile = db.get_profile_by_user_id(user["id"])
+        has_profile = profile is not None
+        profile_id = profile["id"] if profile else None
+
+        return UserResponse(
+            id=user["id"],
+            username=user["username"],
+            penn_verified=user["penn_verified"],
+            has_profile=has_profile,
+            profile_id=profile_id,
+            created_at=user.get("created_at"),
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Get me error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/auth/profile", response_model=StudentProfile)
+async def get_my_profile(current_user: dict = Depends(require_auth)):
+    """Get current user's student profile"""
+    try:
+        db = get_supabase_service()
+
+        profile = db.get_profile_by_user_id(current_user["user_id"])
+        if not profile:
+            raise HTTPException(status_code=404, detail="Profile not found")
+
+        return profile
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Get my profile error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/auth/profile", response_model=StudentProfile)
+async def create_my_profile(
+    profile: StudentProfileCreate,
+    current_user: dict = Depends(require_auth),
+):
+    """Create student profile for current user"""
+    try:
+        db = get_supabase_service()
+
+        # Check if user already has a profile
+        existing = db.get_profile_by_user_id(current_user["user_id"])
+        if existing:
+            raise HTTPException(status_code=400, detail="Profile already exists")
+
+        result = db.create_student_profile_for_user(
+            current_user["user_id"],
+            profile.model_dump(),
+        )
+        return result
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Create my profile error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.patch("/api/auth/profile", response_model=StudentProfile)
+async def update_my_profile(
+    updates: StudentProfileUpdate,
+    current_user: dict = Depends(require_auth),
+):
+    """Update current user's student profile"""
+    try:
+        db = get_supabase_service()
+
+        # Filter out None values
+        update_data = {k: v for k, v in updates.model_dump().items() if v is not None}
+
+        if not update_data:
+            raise HTTPException(status_code=400, detail="No updates provided")
+
+        result = db.update_student_profile_by_user_id(current_user["user_id"], update_data)
+        if not result:
+            raise HTTPException(status_code=404, detail="Profile not found")
+
+        return result
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Update my profile error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 # ============ Research Opportunities ============
@@ -134,15 +391,20 @@ async def search_opportunities(request: SearchRequest):
         is_paid = filters.is_paid if filters else None
         is_work_study = filters.is_work_study if filters else None
 
-        # First, apply hard filters if provided
-        opportunities = db.get_opportunities(
-            research_categories=research_categories,
-            preferred_student_years=preferred_student_years,
-            is_volunteer=is_volunteer,
-            is_paid=is_paid,
-            is_work_study=is_work_study,
-            limit=200,  # Get more for LLM filtering
-        )
+        # For LLM search, get ALL opportunities (keyword pre-filtering happens in LLM service)
+        # If filters are applied, get filtered subset; otherwise get all
+        if any([research_categories, preferred_student_years, is_volunteer, is_paid, is_work_study]):
+            opportunities = db.get_opportunities(
+                research_categories=research_categories,
+                preferred_student_years=preferred_student_years,
+                is_volunteer=is_volunteer,
+                is_paid=is_paid,
+                is_work_study=is_work_study,
+                limit=1000,  # High limit for filtered results
+            )
+        else:
+            # Get ALL opportunities for semantic search (pre-filtering happens in LLM)
+            opportunities = db.get_all_opportunities_for_search()
 
         if not opportunities:
             return SearchResponse(results=[], total_count=0, query=request.query)

@@ -3,8 +3,19 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { api, ResearchOpportunity, FilterOptions, SearchResult } from '@/lib/api';
+import { useProfile } from '@/contexts/ProfileContext';
+import ProtectedRoute from '@/components/ProtectedRoute';
 
 export default function SearchPage() {
+  return (
+    <ProtectedRoute>
+      <SearchContent />
+    </ProtectedRoute>
+  );
+}
+
+function SearchContent() {
+  const { profileId, hasProfile } = useProfile();
   const [opportunities, setOpportunities] = useState<ResearchOpportunity[]>([]);
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [filterOptions, setFilterOptions] = useState<FilterOptions>({ research_categories: [], preferred_student_years: [] });
@@ -24,7 +35,6 @@ export default function SearchPage() {
 
   // Natural language search
   const [query, setQuery] = useState('');
-  const [hasProfile, setHasProfile] = useState(false);
 
   useEffect(() => {
     // Load filter options and initial opportunities
@@ -39,10 +49,6 @@ export default function SearchPage() {
       console.error('Error loading data:', err);
       setLoading(false);
     });
-
-    // Check if profile exists
-    const profileId = localStorage.getItem('studentProfileId');
-    setHasProfile(!!profileId);
   }, []);
 
   const handleFilterSearch = async () => {
@@ -69,7 +75,6 @@ export default function SearchPage() {
 
     setSearching(true);
     try {
-      const profileId = localStorage.getItem('studentProfileId');
       const response = await api.search({
         query: query.trim(),
         student_profile_id: profileId || undefined,

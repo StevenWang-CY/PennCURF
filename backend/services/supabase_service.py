@@ -223,6 +223,73 @@ class SupabaseService:
             "preferred_student_years": sorted(list(all_years)),
         }
 
+    # ============ User Accounts ============
+
+    def create_user_account(
+        self, username: str, password_hash: str, penn_verified: bool = False
+    ) -> Optional[Dict[str, Any]]:
+        """Create a new user account"""
+        result = (
+            self.client.table("user_accounts")
+            .insert({
+                "username": username,
+                "password_hash": password_hash,
+                "penn_verified": penn_verified,
+            })
+            .execute()
+        )
+        return result.data[0] if result.data else None
+
+    def get_user_by_username(self, username: str) -> Optional[Dict[str, Any]]:
+        """Get a user account by username"""
+        result = (
+            self.client.table("user_accounts")
+            .select("*")
+            .eq("username", username)
+            .execute()
+        )
+        return result.data[0] if result.data else None
+
+    def get_user_by_id(self, user_id: UUID) -> Optional[Dict[str, Any]]:
+        """Get a user account by ID"""
+        result = (
+            self.client.table("user_accounts")
+            .select("*")
+            .eq("id", str(user_id))
+            .execute()
+        )
+        return result.data[0] if result.data else None
+
+    def get_profile_by_user_id(self, user_id: UUID) -> Optional[Dict[str, Any]]:
+        """Get a student profile by user_id"""
+        result = (
+            self.client.table("student_profiles")
+            .select("*")
+            .eq("user_id", str(user_id))
+            .execute()
+        )
+        return result.data[0] if result.data else None
+
+    def create_student_profile_for_user(
+        self, user_id: UUID, profile: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        """Create a student profile linked to a user account"""
+        profile_data = {**profile, "user_id": str(user_id)}
+        result = self.client.table("student_profiles").insert(profile_data).execute()
+        return result.data[0] if result.data else {}
+
+    def update_student_profile_by_user_id(
+        self, user_id: UUID, updates: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        """Update a student profile by user_id"""
+        result = (
+            self.client.table("student_profiles")
+            .update(updates)
+            .eq("user_id", str(user_id))
+            .execute()
+        )
+        return result.data[0] if result.data else {}
+
 
 # Singleton instance
 _supabase_service: Optional[SupabaseService] = None
