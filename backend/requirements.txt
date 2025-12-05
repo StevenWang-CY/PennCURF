@@ -1,0 +1,17 @@
+# FastAPI and server
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+python-dotenv==1.0.1
+
+# Database
+supabase==2.10.0
+
+# Web scraping
+requests==2.32.3
+beautifulsoup4==4.12.3
+
+# Azure OpenAI
+openai==1.58.1
+
+# Utilities
+pydantic==2.10.3
