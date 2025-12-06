@@ -38,10 +38,22 @@ app = FastAPI(
     version="1.0.0",
 )
 
+# CORS origins - include production frontend URL from environment
+cors_origins = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]
+# Add production frontend URL if set
+frontend_url = os.getenv("FRONTEND_URL")
+if frontend_url:
+    cors_origins.append(frontend_url)
+    # Also add variations without trailing slash
+    cors_origins.append(frontend_url.rstrip("/"))
+
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
+    allow_origins=cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
