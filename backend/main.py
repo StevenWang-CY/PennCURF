@@ -50,10 +50,14 @@ if frontend_url:
     # Also add variations without trailing slash
     cors_origins.append(frontend_url.rstrip("/"))
 
+# Allow Vercel preview deployments (pattern: *.vercel.app)
+cors_origin_regex = r"https://.*\.vercel\.app"
+
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
     allow_origins=cors_origins,
+    allow_origin_regex=cors_origin_regex,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
