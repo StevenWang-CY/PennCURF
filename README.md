@@ -57,7 +57,6 @@ PennCURF/
 │       │   └── ProfileContext.tsx  # Profile state
 │       └── lib/
 │           └── api.ts              # API client functions
-└── .env.example                    # Environment variables template
 ```
 
 ## Technology Stack
@@ -123,7 +122,7 @@ PennCURF/
 
 ### Environment Setup
 
-Copy `.env.example` to `.env` and configure:
+Create a `.env` file in the root directory and configure:
 
 ```bash
 # Azure OpenAI
