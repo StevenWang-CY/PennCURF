@@ -39,6 +39,17 @@ function cleanScrapedText(text: string | undefined | null): string {
   return cleaned.trim();
 }
 
+// Utility function to validate URLs - only show links with valid http/https URLs
+function isValidUrl(url: string | undefined | null): boolean {
+  if (!url || !url.trim()) return false;
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
+
 export default function OpportunityDetailPage({ params }: PageProps) {
   return (
     <ProtectedRoute>
@@ -260,8 +271,8 @@ function OpportunityDetailContent({ params }: PageProps) {
             )}
 
             <div className="space-y-3 pt-2 border-t border-gray-100">
-              {opportunity.researcher_profile_url && (
-                <a href={opportunity.researcher_profile_url} target="_blank" rel="noopener noreferrer" className="flex items-center text-sm text-gray-600 hover:text-[#011F5B] transition-colors group">
+              {isValidUrl(opportunity.researcher_profile_url) && (
+                <a href={opportunity.researcher_profile_url!} target="_blank" rel="noopener noreferrer" className="flex items-center text-sm text-gray-600 hover:text-[#011F5B] transition-colors group">
                   <span className="w-6 h-6 rounded-full bg-blue-50 text-[#011F5B] flex items-center justify-center mr-3 group-hover:bg-[#011F5B] group-hover:text-white transition-colors">
                     <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
                   </span>
@@ -269,8 +280,8 @@ function OpportunityDetailContent({ params }: PageProps) {
                   <svg className="w-3 h-3 ml-auto opacity-0 group-hover:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
                 </a>
               )}
-              {opportunity.department_page_url && (
-                <a href={opportunity.department_page_url} target="_blank" rel="noopener noreferrer" className="flex items-center text-sm text-gray-600 hover:text-[#011F5B] transition-colors group">
+              {isValidUrl(opportunity.department_page_url) && (
+                <a href={opportunity.department_page_url!} target="_blank" rel="noopener noreferrer" className="flex items-center text-sm text-gray-600 hover:text-[#011F5B] transition-colors group">
                   <span className="w-6 h-6 rounded-full bg-blue-50 text-[#011F5B] flex items-center justify-center mr-3 group-hover:bg-[#011F5B] group-hover:text-white transition-colors">
                     <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
                   </span>
@@ -278,8 +289,8 @@ function OpportunityDetailContent({ params }: PageProps) {
                   <svg className="w-3 h-3 ml-auto opacity-0 group-hover:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
                 </a>
               )}
-              {opportunity.project_website && (
-                <a href={opportunity.project_website} target="_blank" rel="noopener noreferrer" className="flex items-center text-sm text-gray-600 hover:text-[#011F5B] transition-colors group">
+              {isValidUrl(opportunity.project_website) && (
+                <a href={opportunity.project_website!} target="_blank" rel="noopener noreferrer" className="flex items-center text-sm text-gray-600 hover:text-[#011F5B] transition-colors group">
                   <span className="w-6 h-6 rounded-full bg-blue-50 text-[#011F5B] flex items-center justify-center mr-3 group-hover:bg-[#011F5B] group-hover:text-white transition-colors">
                     <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" /></svg>
                   </span>

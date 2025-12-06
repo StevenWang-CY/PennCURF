@@ -410,6 +410,206 @@ Sort by score descending. Return up to 15 matches."""
                 for opp in opportunities[:top_k]
             ]
 
+    def _clean_scraped_text(self, text: str) -> str:
+        """Clean scraped text that may contain extra 'Details:' section or other artifacts."""
+        if not text:
+            return ""
+
+        # Remove "Details:" section and everything after common markers
+        markers = [
+            'Details:',
+            'Preferred Student Year',
+            'VolunteerYes',
+            'VolunteerNo',
+            'PaidYes',
+            'PaidNo',
+            'Work StudyYes',
+            'Work StudyNo',
+            'Researcher',
+        ]
+
+        cleaned = text
+        for marker in markers:
+            idx = cleaned.find(marker)
+            if idx > 0:
+                cleaned = cleaned[:idx]
+
+        return cleaned.strip()
+
+    def _truncate_at_sentence(self, text: str, max_chars: int) -> str:
+        """Truncate text at a sentence boundary, respecting word boundaries."""
+        if not text or len(text) <= max_chars:
+            return text
+
+        # Find the last sentence boundary before max_chars
+        truncated = text[:max_chars]
+
+        # Look for sentence endings
+        last_period = truncated.rfind('. ')
+        last_question = truncated.rfind('? ')
+        last_exclaim = truncated.rfind('! ')
+
+        # Find the best sentence boundary
+        best_boundary = max(last_period, last_question, last_exclaim)
+
+        if best_boundary > max_chars // 2:  # Only use if we keep at least half the content
+            return text[:best_boundary + 1].strip()
+
+        # Fall back to word boundary
+        last_space = truncated.rfind(' ')
+        if last_space > max_chars // 2:
+            return text[:last_space].strip()
+
+        return truncated.strip()
+
+    def _extract_research_topics(self, text: str) -> str:
+        """
+        Extract key research topics/themes from mentor_areas or description text.
+        Converts full sentences into concise topic phrases suitable for email templates.
+        """
+        if not text:
+            return ""
+
+        # Common prefixes to remove (lab introductions)
+        prefixes_to_remove = [
+            r"^The \w+ Lab is interested in ",
+            r"^The \w+ lab is interested in ",
+            r"^Our lab is interested in ",
+            r"^Our lab focuses on ",
+            r"^Our research focuses on ",
+            r"^We are interested in ",
+            r"^We focus on ",
+            r"^The lab is interested in ",
+            r"^This project focuses on ",
+            r"^This research focuses on ",
+            r"^Our goal is to ",
+            r"^The goal is to ",
+        ]
+
+        import re
+        cleaned = text.strip()
+
+        # Remove common lab introduction prefixes
+        for prefix in prefixes_to_remove:
+            cleaned = re.sub(prefix, "", cleaned, flags=re.IGNORECASE)
+
+        # If it starts with "understanding", "studying", "investigating", etc., that's good
+        # But capitalize the first letter
+        if cleaned and cleaned[0].islower():
+            cleaned = cleaned[0].upper() + cleaned[1:]
+
+        # Take only the first sentence or clause
+        # Look for sentence end or clause separator
+        end_markers = ['. ', '! ', '? ', '; ', ' - ']
+        first_end = len(cleaned)
+        for marker in end_markers:
+            pos = cleaned.find(marker)
+            if pos > 20 and pos < first_end:  # At least 20 chars, find earliest end
+                first_end = pos
+
+        if first_end < len(cleaned):
+            cleaned = cleaned[:first_end]
+
+        # Remove trailing punctuation
+        cleaned = cleaned.rstrip('.,;:!?')
+
+        # If still too long, truncate at a reasonable point
+        if len(cleaned) > 100:
+            # Find a good break point (comma, 'and', 'or')
+            break_markers = [', and ', ', or ', ', which ', ', that ', ', ']
+            for marker in break_markers:
+                pos = cleaned.find(marker)
+                if 30 < pos < 90:
+                    cleaned = cleaned[:pos]
+                    break
+            else:
+                # Last resort: word boundary, but avoid ending on prepositions/conjunctions
+                if len(cleaned) > 100:
+                    # Words we don't want to end on
+                    bad_endings = ['and', 'or', 'the', 'a', 'an', 'in', 'on', 'at', 'to', 'for',
+                                   'of', 'with', 'from', 'by', 'as', 'that', 'which', 'who']
+
+                    # Find a good word boundary
+                    truncated = cleaned[:100]
+                    last_space = truncated.rfind(' ')
+
+                    if last_space > 50:
+                        candidate = cleaned[:last_space]
+                        # Check if we ended on a bad word
+                        last_word = candidate.split()[-1].lower() if candidate.split() else ""
+
+                        if last_word in bad_endings:
+                            # Try to find an earlier good break point
+                            words = candidate.split()
+                            for i in range(len(words) - 1, max(0, len(words) - 4), -1):
+                                if words[i].lower() not in bad_endings:
+                                    cleaned = ' '.join(words[:i+1])
+                                    break
+                            else:
+                                # If still bad, just take fewer words
+                                cleaned = ' '.join(words[:-1]) if len(words) > 1 else candidate
+                        else:
+                            cleaned = candidate
+
+        return cleaned.strip()
+
+    def _polish_email(self, subject: str, body: str) -> Dict[str, str]:
+        """
+        Polish the email through LLM to correct grammar and improve flow.
+        This is a light refinement pass, not a complete rewrite.
+        """
+        polish_prompt = f"""You are an expert editor. Polish the following cold email to correct any grammar mistakes and slightly improve the flow while keeping the content and meaning intact.
+
+IMPORTANT RULES:
+- DO NOT change the overall structure or add new content
+- DO NOT make it longer - keep it concise
+- DO NOT change the tone (keep it professional but genuine)
+- DO NOT add flowery language or excessive praise
+- ONLY fix grammar issues, awkward phrasing, and improve natural flow
+- Keep the same greeting, closing, and signature format
+
+CURRENT EMAIL:
+Subject: {subject}
+
+Body:
+{body}
+
+Return the polished email in this exact JSON format:
+{{
+    "subject": "Polished subject line",
+    "body": "Polished email body with proper line breaks using \\n"
+}}
+
+Return ONLY valid JSON, no other text."""
+
+        try:
+            response = self.client.chat.completions.create(
+                model=self.deployment_name,
+                messages=[
+                    {
+                        "role": "system",
+                        "content": "You are a professional editor specializing in academic correspondence. Make minimal, precise improvements to grammar and flow. Always return valid JSON.",
+                    },
+                    {"role": "user", "content": polish_prompt},
+                ],
+                max_completion_tokens=1500,
+            )
+            content = response.choices[0].message.content
+
+            # Clean up potential markdown code blocks
+            if "```json" in content:
+                content = content.split("```json")[1].split("```")[0]
+            elif "```" in content:
+                content = content.split("```")[1].split("```")[0]
+
+            polished = json.loads(content.strip())
+            return polished
+
+        except Exception as e:
+            print(f"Email polish error (using original): {e}")
+            # If polishing fails, return the original
+            return {"subject": subject, "body": body}
+
     def generate_cold_email(
         self,
         opportunity: Dict[str, Any],
@@ -423,9 +623,11 @@ Sort by score descending. Return up to 15 matches."""
         researcher_name = opportunity.get("researcher_name", "Professor")
         researcher_title = opportunity.get("researcher_title", "")
         project_title = opportunity.get("title", "")
-        project_description = opportunity.get("description", "")
-        mentor_areas = opportunity.get("mentor_areas", "")
-        qualifications = opportunity.get("preferred_qualifications", "")
+
+        # Clean scraped data to remove artifacts
+        project_description = self._clean_scraped_text(opportunity.get("description", ""))
+        mentor_areas = self._clean_scraped_text(opportunity.get("mentor_areas", ""))
+        qualifications = self._clean_scraped_text(opportunity.get("preferred_qualifications", ""))
 
         student_name = student_profile.get("name", "Student")
         student_year = student_profile.get("year", "")
@@ -433,8 +635,6 @@ Sort by score descending. Return up to 15 matches."""
         student_interests = student_profile.get("academic_interests", [])
         student_career = student_profile.get("career_interests", [])
         student_skills = student_profile.get("skills", [])
-        student_experience = student_profile.get("experience", "")
-
         student_experience = student_profile.get("experience", "")
 
         # Check if this is a revision request
@@ -468,48 +668,82 @@ Return ONLY valid JSON:
     "body": "Revised Body"
 }}"""
         else:
-            # Standard Generation Prompt
-            prompt = f"""Generate a professional cold email for an undergraduate student reaching out to a faculty member about a research opportunity.
+            # Standard Generation Prompt - Optimized for effective cold emails
+            prompt = f"""You are an expert at crafting successful cold emails that help undergraduate students secure research positions. Generate a compelling, natural email.
 
-FACULTY INFORMATION:
-- Name: {researcher_name}
+PROFESSOR/LAB INFORMATION:
+- Professor Name: {researcher_name}
 - Title: {researcher_title}
-- Project Title: {project_title}
+- Research Project: {project_title}
 - Project Description: {project_description if project_description else 'Not available'}
-- Mentor Areas: {mentor_areas if mentor_areas else 'Not available'}
-- Preferred Qualifications: {qualifications if qualifications else 'Not specified'}
+- Research Focus/Mentor Areas: {mentor_areas if mentor_areas else 'Not available'}
+- What They're Looking For: {qualifications if qualifications else 'Not specified'}
 
-STUDENT INFORMATION:
+STUDENT PROFILE:
 - Name: {student_name}
 - Year: {student_year}
 - Major: {student_major}
 - Academic Interests: {', '.join(student_interests) if student_interests else 'Not specified'}
-- Career Interests: {', '.join(student_career) if student_career else 'Not specified'}
-- Skills: {', '.join(student_skills) if student_skills else 'Not specified'}
-- Experience: {student_experience if student_experience else 'Not specified'}
+- Career Goals: {', '.join(student_career) if student_career else 'Not specified'}
+- Technical Skills: {', '.join(student_skills) if student_skills else 'Not specified'}
+- Past Experience: {student_experience if student_experience else 'Not specified'}
 
-Generate an email that:
-1. Has a clear, specific subject line
-2. Opens with a professional greeting using the professor's name
-3. Introduces the student briefly (name, year, major)
-4. Explains why they're interested in THIS specific research (connect to project description)
-5. Highlights relevant skills/experience that match the qualifications
-6. Makes a polite request to discuss opportunities
-7. Closes professionally
+CRITICAL REQUIREMENTS FOR AN EFFECTIVE COLD EMAIL:
 
-The email should be:
-- Concise (under 250 words for the body)
-- Professional but personable
-- Specific to this opportunity (not generic)
-- Free of typos and grammatically correct
+1. SUBJECT LINE: Specific and attention-grabbing
+   - Include the project name or research area
+   - Example: "Penn Undergrad Interested in [Specific Research Area] Research"
+
+2. OPENING (1-2 sentences):
+   - Address professor formally (Dear Professor [Last Name])
+   - Immediately state who you are and why you're writing
+   - Mention where you found the opportunity (CURF Research Directory)
+
+3. WHY THIS RESEARCH (2-3 sentences):
+   - Show you've READ and UNDERSTOOD their project description
+   - Reference SPECIFIC aspects of their research that excite you
+   - Connect their work to your genuine academic interests
+   - DO NOT use generic phrases like "I find your research fascinating"
+
+4. YOUR QUALIFICATIONS (2-3 sentences):
+   - Draw DIRECT CONNECTIONS between your experience and what they need
+   - If they need Python, mention your Python projects
+   - If they need lab work, mention your lab experience
+   - Be specific: "In my internship at X, I used Y to accomplish Z"
+   - If experience is limited, emphasize relevant coursework, quick learning ability, and enthusiasm
+
+5. THE ASK (1-2 sentences):
+   - Be clear but not demanding
+   - Ask for a brief meeting or call to discuss opportunities
+   - Show flexibility: "at your convenience" or "when your schedule permits"
+
+6. CLOSING:
+   - Thank them for their time
+   - Professional sign-off with full name
+   - Include Penn email if available
+
+STYLE GUIDELINES:
+- Total length: 150-200 words (professors are busy!)
+- Tone: Professional yet genuine, confident but humble
+- NO flattery or over-the-top praise
+- NO generic templates - every sentence should be specific to THIS opportunity
+- Use natural language, not stiff corporate-speak
+- Show personality while maintaining professionalism
+
+WHAT MAKES PROFESSORS RESPOND:
+- Specific knowledge of their work (not just surface-level)
+- Clear demonstration of relevant skills
+- Genuine enthusiasm backed by evidence
+- Respect for their time (concise email)
+- Clear next step/ask
 
 Return your response in this exact JSON format:
 {{
     "subject": "Subject line here",
-    "body": "Full email body here"
+    "body": "Full email body here with proper line breaks using \\n"
 }}
 
-Return ONLY the JSON, no other text."""
+Return ONLY valid JSON, no other text."""
 
         try:
             response = self.client.chat.completions.create(
@@ -517,11 +751,11 @@ Return ONLY the JSON, no other text."""
                 messages=[
                     {
                         "role": "system",
-                        "content": "You are an expert at writing professional academic emails. Always return valid JSON.",
+                        "content": "You are an expert academic career advisor who has helped hundreds of students land research positions through effective cold emails. You understand what professors look for: genuine interest, relevant qualifications, and respect for their time. Generate natural, personalized emails that get responses. Always return valid JSON.",
                     },
                     {"role": "user", "content": prompt},
                 ],
-                max_completion_tokens=1000,
+                max_completion_tokens=1500,
             )
             content = response.choices[0].message.content
             # Clean up potential markdown code blocks
@@ -530,25 +764,80 @@ Return ONLY the JSON, no other text."""
             elif "```" in content:
                 content = content.split("```")[1].split("```")[0]
 
-            return json.loads(content.strip())
+            generated_email = json.loads(content.strip())
+
+            # Polish the email for grammar and flow
+            polished = self._polish_email(generated_email.get("subject", ""), generated_email.get("body", ""))
+
+            return {
+                "subject": polished.get("subject", generated_email.get("subject", "")),
+                "body": polished.get("body", generated_email.get("body", "")),
+                "professor_email": opportunity.get("researcher_email"),
+                "professor_name": researcher_name,
+            }
 
         except Exception as e:
             print(f"Email generation error: {e}")
-            # Fallback template
-            return {
-                "subject": f"Research Opportunity Inquiry - {project_title}",
-                "body": f"""Dear {researcher_name},
+            # Improved fallback template
+            # Extract professor's last name for formal address
+            prof_last_name = researcher_name.split()[-1] if researcher_name else "Professor"
 
-I am {student_name}, a {student_year} studying {student_major} at the University of Pennsylvania. I recently came across your research on "{project_title}" through the CURF Research Directory and am very interested in potentially joining your lab.
+            # Build skills mention if available (use first 3 skills, properly formatted)
+            skills_mention = ""
+            if student_skills:
+                skills_list = student_skills[:3]
+                skills_mention = f" I have experience with {', '.join(skills_list)}, which I believe would be valuable for this work."
 
-Your work on {mentor_areas if mentor_areas else 'this research area'}... resonates with my academic interests in {', '.join(student_interests[:2]) if student_interests else 'this field'}.
+            # Build experience mention if available (truncate at sentence boundary)
+            exp_mention = ""
+            if student_experience:
+                clean_exp = self._truncate_at_sentence(student_experience, 200)
+                if clean_exp:
+                    exp_mention = f" {clean_exp}"
 
-I would be grateful for the opportunity to discuss potential research positions in your lab. I am available to meet at your convenience.
+            # Extract clean research topics from mentor areas
+            research_focus = ""
+            if mentor_areas:
+                research_focus = self._extract_research_topics(mentor_areas)
+            if not research_focus and project_title:
+                research_focus = project_title
 
-Thank you for your time and consideration.
+            # Format interests properly
+            interests_text = student_major
+            if student_interests and len(student_interests) >= 2:
+                interests_text = f"{student_interests[0]} and {student_interests[1]}"
+            elif student_interests:
+                interests_text = student_interests[0]
+
+            # Build the research interest sentence - handle different cases
+            if research_focus and research_focus != project_title:
+                # We have extracted topics - use a natural sentence structure
+                research_sentence = f"Your research on {research_focus.lower()} particularly resonates with my academic interests in {interests_text}."
+            else:
+                # Fall back to project title
+                research_sentence = f"Your research on \"{project_title}\" aligns well with my academic interests in {interests_text}."
+
+            # Build draft email from template
+            draft_subject = f"Penn {student_year} Interested in {project_title} Research"
+            draft_body = f"""Dear Professor {prof_last_name},
+
+I am {student_name}, a {student_year} majoring in {student_major} at the University of Pennsylvania. I discovered your research on "{project_title}" through the CURF Research Directory and am writing to express my interest in joining your lab as a research assistant.
+
+{research_sentence}{skills_mention}{exp_mention}
+
+I would welcome the opportunity to discuss how I might contribute to your research. Would you be available for a brief meeting at your convenience?
+
+Thank you for considering my inquiry.
 
 Best regards,
-{student_name}""",
+{student_name}"""
+
+            # Polish the fallback email for grammar and flow
+            polished = self._polish_email(draft_subject, draft_body)
+
+            return {
+                "subject": polished.get("subject", draft_subject),
+                "body": polished.get("body", draft_body),
                 "professor_email": opportunity.get("researcher_email"),
                 "professor_name": researcher_name,
             }
