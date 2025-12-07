@@ -462,96 +462,71 @@ Sort by score descending. Return up to 15 matches."""
 
         return truncated.strip()
 
-    def _extract_research_topics(self, text: str) -> str:
+    def _extract_research_topics(self, text: str) -> list:
         """
         Extract key research topics/themes from mentor_areas or description text.
-        Converts full sentences into concise topic phrases suitable for email templates.
+        Returns a list of clean topic phrases (not bullet points).
         """
         if not text:
-            return ""
-
-        # Common prefixes to remove (lab introductions)
-        prefixes_to_remove = [
-            r"^The \w+ Lab is interested in ",
-            r"^The \w+ lab is interested in ",
-            r"^Our lab is interested in ",
-            r"^Our lab focuses on ",
-            r"^Our research focuses on ",
-            r"^We are interested in ",
-            r"^We focus on ",
-            r"^The lab is interested in ",
-            r"^This project focuses on ",
-            r"^This research focuses on ",
-            r"^Our goal is to ",
-            r"^The goal is to ",
-        ]
+            return []
 
         import re
-        cleaned = text.strip()
 
-        # Remove common lab introduction prefixes
-        for prefix in prefixes_to_remove:
-            cleaned = re.sub(prefix, "", cleaned, flags=re.IGNORECASE)
+        # Split on common delimiters (bullets, newlines, semicolons, "and")
+        # to get individual topics
+        delimiters = r'[•\n;]|(?:,\s*and\s+)|(?:\s+and\s+)'
+        parts = re.split(delimiters, text)
 
-        # If it starts with "understanding", "studying", "investigating", etc., that's good
-        # But capitalize the first letter
-        if cleaned and cleaned[0].islower():
-            cleaned = cleaned[0].upper() + cleaned[1:]
+        topics = []
+        for part in parts:
+            # Clean each part
+            cleaned = part.strip()
+            cleaned = re.sub(r'^[-–—*·]\s*', '', cleaned)  # Remove leading bullets/dashes
+            cleaned = re.sub(r'^\d+[.)]\s*', '', cleaned)  # Remove numbered list markers
 
-        # Take only the first sentence or clause
-        # Look for sentence end or clause separator
-        end_markers = ['. ', '! ', '? ', '; ', ' - ']
-        first_end = len(cleaned)
-        for marker in end_markers:
-            pos = cleaned.find(marker)
-            if pos > 20 and pos < first_end:  # At least 20 chars, find earliest end
-                first_end = pos
+            # Remove common lab introduction prefixes
+            prefixes = [
+                r"^The \w+ Lab is interested in ",
+                r"^Our lab focuses on ",
+                r"^Our research focuses on ",
+                r"^We are interested in ",
+                r"^This project focuses on ",
+            ]
+            for prefix in prefixes:
+                cleaned = re.sub(prefix, "", cleaned, flags=re.IGNORECASE)
 
-        if first_end < len(cleaned):
-            cleaned = cleaned[:first_end]
+            # Clean up and validate
+            cleaned = cleaned.strip(' .,;:')
 
-        # Remove trailing punctuation
-        cleaned = cleaned.rstrip('.,;:!?')
+            # Only keep meaningful topics (3+ words, not too long)
+            word_count = len(cleaned.split())
+            if word_count >= 2 and len(cleaned) > 10 and len(cleaned) < 100:
+                # Lowercase for natural sentence flow
+                if cleaned and cleaned[0].isupper():
+                    cleaned = cleaned[0].lower() + cleaned[1:]
+                topics.append(cleaned)
 
-        # If still too long, truncate at a reasonable point
-        if len(cleaned) > 100:
-            # Find a good break point (comma, 'and', 'or')
-            break_markers = [', and ', ', or ', ', which ', ', that ', ', ']
-            for marker in break_markers:
-                pos = cleaned.find(marker)
-                if 30 < pos < 90:
-                    cleaned = cleaned[:pos]
+        # Return unique topics, max 3
+        seen = set()
+        unique_topics = []
+        for t in topics:
+            if t.lower() not in seen:
+                seen.add(t.lower())
+                unique_topics.append(t)
+                if len(unique_topics) >= 3:
                     break
-            else:
-                # Last resort: word boundary, but avoid ending on prepositions/conjunctions
-                if len(cleaned) > 100:
-                    # Words we don't want to end on
-                    bad_endings = ['and', 'or', 'the', 'a', 'an', 'in', 'on', 'at', 'to', 'for',
-                                   'of', 'with', 'from', 'by', 'as', 'that', 'which', 'who']
 
-                    # Find a good word boundary
-                    truncated = cleaned[:100]
-                    last_space = truncated.rfind(' ')
+        return unique_topics
 
-                    if last_space > 50:
-                        candidate = cleaned[:last_space]
-                        # Check if we ended on a bad word
-                        last_word = candidate.split()[-1].lower() if candidate.split() else ""
-
-                        if last_word in bad_endings:
-                            # Try to find an earlier good break point
-                            words = candidate.split()
-                            for i in range(len(words) - 1, max(0, len(words) - 4), -1):
-                                if words[i].lower() not in bad_endings:
-                                    cleaned = ' '.join(words[:i+1])
-                                    break
-                            else:
-                                # If still bad, just take fewer words
-                                cleaned = ' '.join(words[:-1]) if len(words) > 1 else candidate
-                        else:
-                            cleaned = candidate
-
-        return cleaned.strip()
+    def _format_topics_naturally(self, topics: list) -> str:
+        """Convert a list of topics into a natural English phrase."""
+        if not topics:
+            return ""
+        if len(topics) == 1:
+            return topics[0]
+        if len(topics) == 2:
+            return f"{topics[0]} and {topics[1]}"
+        return f"{', '.join(topics[:-1])}, and {topics[-1]}"
 
     def _polish_email(self, subject: str, body: str) -> Dict[str, str]:
         """
@@ -668,8 +643,8 @@ Return ONLY valid JSON:
     "body": "Revised Body"
 }}"""
         else:
-            # Standard Generation Prompt - Optimized for effective cold emails
-            prompt = f"""You are an expert at crafting successful cold emails that help undergraduate students secure research positions. Generate a compelling, natural email.
+            # Standard Generation Prompt - Optimized for natural, persuasive cold emails
+            prompt = f"""You are an expert at crafting cold emails that actually get responses from professors. Your emails sound like they were written by a thoughtful student, not generated by AI.
 
 PROFESSOR/LAB INFORMATION:
 - Professor Name: {researcher_name}
@@ -688,54 +663,46 @@ STUDENT PROFILE:
 - Technical Skills: {', '.join(student_skills) if student_skills else 'Not specified'}
 - Past Experience: {student_experience if student_experience else 'Not specified'}
 
-CRITICAL REQUIREMENTS FOR AN EFFECTIVE COLD EMAIL:
+WRITE AN EMAIL THAT:
 
-1. SUBJECT LINE: Specific and attention-grabbing
-   - Include the project name or research area
-   - Example: "Penn Undergrad Interested in [Specific Research Area] Research"
+1. OPENS STRONG (2 sentences max)
+   - "Dear Professor [Last Name]," (formal)
+   - Introduce yourself briefly and state your purpose
+   - Mention you found them through CURF
 
-2. OPENING (1-2 sentences):
-   - Address professor formally (Dear Professor [Last Name])
-   - Immediately state who you are and why you're writing
-   - Mention where you found the opportunity (CURF Research Directory)
+2. SHOWS GENUINE UNDERSTANDING (2-3 sentences)
+   - Demonstrate you actually READ about their research
+   - Pick ONE specific aspect that genuinely interests you and explain WHY
+   - Connect it to your own intellectual curiosity or goals
+   - NEVER use bullet points or lists - write in natural prose
+   - NEVER say "Your research on X, Y, and Z interests me" - that's lazy
+   - INSTEAD: Explain what about the research excites you and how it connects to your interests
 
-3. WHY THIS RESEARCH (2-3 sentences):
-   - Show you've READ and UNDERSTOOD their project description
-   - Reference SPECIFIC aspects of their research that excite you
-   - Connect their work to your genuine academic interests
-   - DO NOT use generic phrases like "I find your research fascinating"
+3. MAKES YOUR CASE (2-3 sentences)
+   - Connect YOUR specific skills/experience to THEIR needs
+   - Be concrete: "At [Company], I built X using Y" not "I have experience with Y"
+   - If limited experience, show eagerness to learn and relevant coursework
+   - NEVER just list skills - weave them into a narrative
 
-4. YOUR QUALIFICATIONS (2-3 sentences):
-   - Draw DIRECT CONNECTIONS between your experience and what they need
-   - If they need Python, mention your Python projects
-   - If they need lab work, mention your lab experience
-   - Be specific: "In my internship at X, I used Y to accomplish Z"
-   - If experience is limited, emphasize relevant coursework, quick learning ability, and enthusiasm
+4. ASKS CLEARLY (1-2 sentences)
+   - Request a brief meeting (15-20 min)
+   - Be flexible on timing
+   - Thank them
 
-5. THE ASK (1-2 sentences):
-   - Be clear but not demanding
-   - Ask for a brief meeting or call to discuss opportunities
-   - Show flexibility: "at your convenience" or "when your schedule permits"
+CRITICAL STYLE RULES:
+- 150-200 words MAXIMUM (professors skim long emails)
+- NO bullet points or lists anywhere in the email
+- NO generic phrases: "I find your research fascinating," "I am passionate about," "I would be honored"
+- Write like a real person, not a template
+- Every sentence should be specific to THIS professor and THIS student
+- Confidence without arrogance, interest without desperation
+- Use contractions naturally (I'm, I've, I'd) - sounds more human
 
-6. CLOSING:
-   - Thank them for their time
-   - Professional sign-off with full name
-   - Include Penn email if available
+BAD EXAMPLE (don't do this):
+"Your research on machine learning, cancer genomics, and molecular evolution interests me. I have skills in Python, Java, and SQL."
 
-STYLE GUIDELINES:
-- Total length: 150-200 words (professors are busy!)
-- Tone: Professional yet genuine, confident but humble
-- NO flattery or over-the-top praise
-- NO generic templates - every sentence should be specific to THIS opportunity
-- Use natural language, not stiff corporate-speak
-- Show personality while maintaining professionalism
-
-WHAT MAKES PROFESSORS RESPOND:
-- Specific knowledge of their work (not just surface-level)
-- Clear demonstration of relevant skills
-- Genuine enthusiasm backed by evidence
-- Respect for their time (concise email)
-- Clear next step/ask
+GOOD EXAMPLE:
+"Your work applying deep learning to identify cancer biomarkers caught my attention—it's exactly the kind of problem I want to tackle. Last summer at [Company], I built predictive models using Python and TensorFlow, and I'd love to apply those skills to genomics research."
 
 Return your response in this exact JSON format:
 {{
@@ -778,56 +745,64 @@ Return ONLY valid JSON, no other text."""
 
         except Exception as e:
             print(f"Email generation error: {e}")
-            # Improved fallback template
-            # Extract professor's last name for formal address
+            # Improved fallback template - natural and persuasive
             prof_last_name = researcher_name.split()[-1] if researcher_name else "Professor"
 
-            # Build skills mention if available (use first 3 skills, properly formatted)
-            skills_mention = ""
-            if student_skills:
-                skills_list = student_skills[:3]
-                skills_mention = f" I have experience with {', '.join(skills_list)}, which I believe would be valuable for this work."
-
-            # Build experience mention if available (truncate at sentence boundary)
-            exp_mention = ""
-            if student_experience:
-                clean_exp = self._truncate_at_sentence(student_experience, 200)
-                if clean_exp:
-                    exp_mention = f" {clean_exp}"
-
-            # Extract clean research topics from mentor areas
-            research_focus = ""
+            # Extract and format research topics naturally
+            research_topics = []
             if mentor_areas:
-                research_focus = self._extract_research_topics(mentor_areas)
-            if not research_focus and project_title:
-                research_focus = project_title
+                research_topics = self._extract_research_topics(mentor_areas)
+            if not research_topics and project_description:
+                research_topics = self._extract_research_topics(project_description)
 
-            # Format interests properly
-            interests_text = student_major
-            if student_interests and len(student_interests) >= 2:
-                interests_text = f"{student_interests[0]} and {student_interests[1]}"
-            elif student_interests:
-                interests_text = student_interests[0]
-
-            # Build the research interest sentence - handle different cases
-            if research_focus and research_focus != project_title:
-                # We have extracted topics - use a natural sentence structure
-                research_sentence = f"Your research on {research_focus.lower()} particularly resonates with my academic interests in {interests_text}."
+            # Build the "why this research" paragraph - the most important part
+            why_paragraph = ""
+            if research_topics:
+                topics_phrase = self._format_topics_naturally(research_topics)
+                # Connect to student's interests naturally
+                if student_interests:
+                    main_interest = student_interests[0].lower() if student_interests else student_major.lower()
+                    why_paragraph = f"I am particularly drawn to your work on {topics_phrase}. As someone deeply interested in {main_interest}, I find the intersection of your research with real-world applications especially compelling."
+                else:
+                    why_paragraph = f"I am particularly drawn to your work on {topics_phrase}, and I am eager to contribute to research that pushes the boundaries of this field."
             else:
-                # Fall back to project title
-                research_sentence = f"Your research on \"{project_title}\" aligns well with my academic interests in {interests_text}."
+                # Use project title if no topics extracted
+                why_paragraph = f"After reading about \"{project_title},\" I was excited by the opportunity to contribute to research that aligns with my academic interests and career goals."
 
-            # Build draft email from template
-            draft_subject = f"Penn {student_year} Interested in {project_title} Research"
+            # Build qualifications paragraph - specific and relevant
+            qual_paragraph = ""
+            if student_skills and student_experience:
+                # Connect skills to experience
+                skills_phrase = self._format_topics_naturally(student_skills[:3])
+                exp_clean = self._truncate_at_sentence(student_experience, 150)
+                qual_paragraph = f"Through my experience—{exp_clean}—I have developed proficiency in {skills_phrase}. I am confident these skills would allow me to contribute meaningfully to your research while continuing to grow as a researcher."
+            elif student_skills:
+                skills_phrase = self._format_topics_naturally(student_skills[:3])
+                qual_paragraph = f"I have developed skills in {skills_phrase} through coursework and personal projects, and I am eager to apply them in a research setting. I am a quick learner who thrives on tackling challenging problems."
+            elif student_experience:
+                exp_clean = self._truncate_at_sentence(student_experience, 200)
+                qual_paragraph = f"My background includes {exp_clean} I believe this experience has prepared me well for the rigors of academic research."
+            else:
+                qual_paragraph = f"As a {student_year} in {student_major}, I am eager to gain hands-on research experience. I am a dedicated learner who is not afraid to dive into unfamiliar territory."
+
+            # Create concise subject line
+            subject_topic = research_topics[0] if research_topics else project_title
+            if len(subject_topic) > 40:
+                subject_topic = subject_topic[:37] + "..."
+            draft_subject = f"Undergraduate Interest in {subject_topic.title()} Research"
+
+            # Assemble the email naturally
             draft_body = f"""Dear Professor {prof_last_name},
 
-I am {student_name}, a {student_year} majoring in {student_major} at the University of Pennsylvania. I discovered your research on "{project_title}" through the CURF Research Directory and am writing to express my interest in joining your lab as a research assistant.
+I am {student_name}, a {student_year} studying {student_major} at Penn. I came across your research through the CURF Research Directory and wanted to reach out about potential opportunities in your lab.
 
-{research_sentence}{skills_mention}{exp_mention}
+{why_paragraph}
 
-I would welcome the opportunity to discuss how I might contribute to your research. Would you be available for a brief meeting at your convenience?
+{qual_paragraph}
 
-Thank you for considering my inquiry.
+I would love the chance to discuss your current projects and how I might contribute. Would you have 15 minutes for a brief conversation at your convenience?
+
+Thank you for your time and consideration.
 
 Best regards,
 {student_name}"""
