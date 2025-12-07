@@ -1,5 +1,7 @@
 # Penn CURF Research Directory
 
+🔗 **Live Demo:** [penn-curf.vercel.app](https://penn-curf.vercel.app)
+
 An AI-powered platform for University of Pennsylvania students to discover, analyze, and apply for research opportunities. Leveraging LLM-based semantic search and intelligent matching, this tool bridges the gap between students and faculty research positions.
 
 ## Features
@@ -15,7 +17,7 @@ An AI-powered platform for University of Pennsylvania students to discover, anal
 - **Compatibility Scoring**: LLM-powered scoring (0-100) with detailed reasoning
 
 ### AI Cold Email Generator
-- **Context-Aware Drafting**: Generates personalized emails referencing specific project details and your qualifications
+- **Context-Aware Drafting**: Generates personalized emails connecting your specific skills and experience to research opportunities
 - **Interactive Revision**: Refine drafts with natural language instructions (e.g., "Make it shorter and more formal")
 
 ### User Authentication
@@ -32,23 +34,34 @@ An AI-powered platform for University of Pennsylvania students to discover, anal
 ```
 PennCURF/
 ├── backend/
-│   ├── main.py                 # FastAPI application with all endpoints
+│   ├── main.py                     # FastAPI application with all endpoints
+│   ├── render.yaml                 # Render deployment configuration
+│   ├── requirements.txt            # Python dependencies
+│   ├── database/
+│   │   └── schema.sql              # PostgreSQL schema for Supabase
 │   ├── models/
-│   │   └── schemas.py          # Pydantic models for API validation
+│   │   └── schemas.py              # Pydantic models for API validation
 │   ├── services/
-│   │   ├── llm_service.py      # LLM-powered search, email, and analysis
-│   │   ├── auth_service.py     # JWT authentication and password hashing
-│   │   └── supabase_service.py # Database operations
+│   │   ├── llm_service.py          # LLM-powered search, email, and analysis
+│   │   ├── auth_service.py         # JWT authentication and password hashing
+│   │   └── supabase_service.py     # Database operations
 │   └── scraper/
-│       └── curf_scraper.py     # CURF directory web scraper
+│       └── curf_scraper.py         # CURF directory web scraper
 ├── frontend/
+│   ├── vercel.json                 # Vercel deployment configuration
+│   ├── package.json                # Node.js dependencies
+│   ├── next.config.ts              # Next.js configuration
+│   ├── tsconfig.json               # TypeScript configuration
 │   └── src/
 │       ├── app/
+│       │   ├── layout.tsx          # Root layout
 │       │   ├── page.tsx            # Landing page
 │       │   ├── search/page.tsx     # Search interface
 │       │   ├── profile/page.tsx    # Profile management
 │       │   ├── opportunity/[id]/   # Opportunity detail view
 │       │   └── auth/               # Login and registration
+│       │       ├── login/page.tsx
+│       │       └── register/page.tsx
 │       ├── components/
 │       │   ├── NavBar.tsx          # Navigation component
 │       │   └── ProtectedRoute.tsx  # Auth route guard
@@ -56,16 +69,19 @@ PennCURF/
 │       │   ├── AuthContext.tsx     # Authentication state
 │       │   └── ProfileContext.tsx  # Profile state
 │       └── lib/
-│           └── api.ts              # API client functions
+│           ├── api.ts              # API client functions
+│           └── utils.ts            # Utility functions
+└── README.md
 ```
 
 ## Technology Stack
 
 ### Frontend
-- **Framework**: Next.js 14 (App Router)
-- **Styling**: Tailwind CSS v3
-- **State**: React Context API
-- **Icons**: Heroicons
+- **Framework**: Next.js 16 (App Router)
+- **Language**: TypeScript 5
+- **UI**: React 19, Tailwind CSS v4
+- **Components**: Radix UI
+- **Icons**: Lucide React
 
 ### Backend
 - **API**: FastAPI (Python 3.11+)
@@ -74,11 +90,16 @@ PennCURF/
 - **Auth**: python-jose (JWT), passlib (bcrypt)
 
 ### Database
-- **Core**: Supabase (PostgreSQL)
+- **Platform**: Supabase (PostgreSQL)
 
 ### AI
 - **Provider**: Azure OpenAI Service
 - **Model**: GPT-4o-mini (configurable)
+
+### Deployment
+- **Frontend**: Vercel
+- **Backend**: Render
+- **Database**: Supabase (cloud)
 
 ## API Endpoints
 
@@ -114,16 +135,39 @@ PennCURF/
 | DELETE | `/api/saved/{student_id}/{opp_id}` | Remove saved |
 | GET | `/api/saved/{student_id}` | Get all saved |
 
-## Getting Started
+## Deployment
+
+The application is deployed on free-tier cloud services:
+
+| Component | Platform | URL |
+|-----------|----------|-----|
+| Frontend | Vercel | [penn-curf.vercel.app](https://penn-curf.vercel.app) |
+| Backend | Render | [penncurf-api.onrender.com](https://penncurf-api.onrender.com) |
+| Database | Supabase | Managed PostgreSQL |
+
+### Deploy Your Own
+
+**Backend (Render):**
+1. Create a new Web Service on [render.com](https://render.com)
+2. Connect your GitHub repo, set root directory to `backend`
+3. Add environment variables (see below)
+4. Deploy with Python 3.11 runtime
+
+**Frontend (Vercel):**
+1. Import project on [vercel.com](https://vercel.com)
+2. Set root directory to `frontend`
+3. Add `NEXT_PUBLIC_API_URL` pointing to your Render backend
+4. Deploy
+
+## Getting Started (Local Development)
 
 ### Prerequisites
 - Node.js (v18+)
 - Python (v3.11+)
 
-### Environment Setup
+### Environment Variables
 
-Create a `.env` file in the root directory and configure:
-
+**Backend (`backend/.env`):**
 ```bash
 # Azure OpenAI
 AZURE_OPENAI_API_KEY=your_key
@@ -136,11 +180,16 @@ SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_ANON_KEY=your_anon_key
 SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
 
-# JWT (generate a secure random key for production)
+# JWT (generate with: openssl rand -hex 32)
 JWT_SECRET_KEY=your-secret-key-change-in-production
 
-# CURF Session (for scraping - get from browser after logging in)
-CURF_SESSION_COOKIE=your_session_cookie
+# CORS (production frontend URL)
+FRONTEND_URL=https://your-app.vercel.app
+```
+
+**Frontend (`frontend/.env.local`):**
+```bash
+NEXT_PUBLIC_API_URL=http://localhost:8000
 ```
 
 ### Backend Setup
@@ -149,7 +198,7 @@ cd backend
 python -m venv .venv
 source .venv/bin/activate  # On Mac/Linux
 pip install -r requirements.txt
-python main.py
+uvicorn main:app --reload
 ```
 API runs at `http://localhost:8000`.
 
@@ -167,9 +216,9 @@ To populate the database with CURF opportunities:
 cd backend
 python scraper/curf_scraper.py
 ```
-Requires valid `CURF_SESSION_COOKIE` from an authenticated Penn browser session.
+Requires valid `CURF_SESSION_COOKIE` environment variable from an authenticated Penn browser session.
 
-## Verification Workflow
+## Usage
 
 1. **Register**: Create an account at `/auth/register`
 2. **Profile**: Complete your profile at `/profile`
