@@ -663,46 +663,50 @@ STUDENT PROFILE:
 - Technical Skills: {', '.join(student_skills) if student_skills else 'Not specified'}
 - Past Experience: {student_experience if student_experience else 'Not specified'}
 
-WRITE AN EMAIL THAT:
+YOUR TASK: Write a persuasive cold email that DIRECTLY CONNECTS the student's background to this specific research opportunity.
 
-1. OPENS STRONG (2 sentences max)
-   - "Dear Professor [Last Name]," (formal)
-   - Introduce yourself briefly and state your purpose
-   - Mention you found them through CURF
+CRITICAL - SKILL/EXPERIENCE MATCHING:
+First, identify which of the student's skills and experiences are MOST RELEVANT to what the professor is looking for:
+- If the project needs programming → highlight relevant coding experience
+- If the project needs data analysis → highlight statistics/data skills
+- If the project needs lab work → highlight any wet lab or research experience
+- If the student has internship/work experience → describe SPECIFIC projects they worked on
+- Connect the dots: "My experience doing X at Y directly prepared me for Z in your lab"
 
-2. SHOWS GENUINE UNDERSTANDING (2-3 sentences)
-   - Demonstrate you actually READ about their research
-   - Pick ONE specific aspect that genuinely interests you and explain WHY
-   - Connect it to your own intellectual curiosity or goals
-   - NEVER use bullet points or lists - write in natural prose
-   - NEVER say "Your research on X, Y, and Z interests me" - that's lazy
-   - INSTEAD: Explain what about the research excites you and how it connects to your interests
+EMAIL STRUCTURE:
 
-3. MAKES YOUR CASE (2-3 sentences)
-   - Connect YOUR specific skills/experience to THEIR needs
-   - Be concrete: "At [Company], I built X using Y" not "I have experience with Y"
-   - If limited experience, show eagerness to learn and relevant coursework
-   - NEVER just list skills - weave them into a narrative
+1. OPENING (2 sentences max)
+   - "Dear Professor [Last Name],"
+   - Quick intro: name, year, major, found via CURF
 
-4. ASKS CLEARLY (1-2 sentences)
-   - Request a brief meeting (15-20 min)
-   - Be flexible on timing
+2. WHY THIS RESEARCH (2-3 sentences)
+   - Pick ONE specific aspect of their research that connects to YOUR background
+   - Explain WHY it excites you based on your own experience/interests
+   - Show you understand what the research actually involves
+
+3. YOUR RELEVANT QUALIFICATIONS (THIS IS THE MOST IMPORTANT PART - 3-4 sentences)
+   - Lead with your STRONGEST relevant experience
+   - Be SPECIFIC: "At [Company], I [specific achievement] using [specific tools]"
+   - If you have internship/work experience, describe what you actually DID, not just where you worked
+   - Connect each qualification to how it would help THIS research
+   - If skills are limited, emphasize: relevant coursework, personal projects, eagerness to learn
+
+4. THE ASK (1-2 sentences)
+   - Request 15-20 min meeting
    - Thank them
 
-CRITICAL STYLE RULES:
-- 150-200 words MAXIMUM (professors skim long emails)
-- NO bullet points or lists anywhere in the email
-- NO generic phrases: "I find your research fascinating," "I am passionate about," "I would be honored"
-- Write like a real person, not a template
-- Every sentence should be specific to THIS professor and THIS student
-- Confidence without arrogance, interest without desperation
-- Use contractions naturally (I'm, I've, I'd) - sounds more human
+STYLE RULES:
+- 180-220 words (enough to show substance, short enough to respect their time)
+- NO bullet points - write in natural paragraphs
+- NO generic phrases like "I find your research fascinating" or "I am passionate about"
+- BE SPECIFIC - vague emails get deleted
+- Sound confident but not arrogant
 
-BAD EXAMPLE (don't do this):
-"Your research on machine learning, cancer genomics, and molecular evolution interests me. I have skills in Python, Java, and SQL."
+BAD EXAMPLE:
+"I have experience with C/C++, SQL, and Java, which I believe would be valuable for this work. I worked at Franklink as a founding engineer and interned at Huatai Securities."
 
 GOOD EXAMPLE:
-"Your work applying deep learning to identify cancer biomarkers caught my attention—it's exactly the kind of problem I want to tackle. Last summer at [Company], I built predictive models using Python and TensorFlow, and I'd love to apply those skills to genomics research."
+"As a founding engineer at Franklink, I built data pipelines processing millions of records daily using Python and SQL—experience that would directly translate to analyzing the large genomic datasets in your lab. My internship at Huatai Securities strengthened my statistical modeling skills, where I developed predictive algorithms that improved trading accuracy by 15%."
 
 Return your response in this exact JSON format:
 {{
@@ -755,54 +759,59 @@ Return ONLY valid JSON, no other text."""
             if not research_topics and project_description:
                 research_topics = self._extract_research_topics(project_description)
 
-            # Build the "why this research" paragraph - the most important part
+            # Build the "why this research" paragraph - connect to student's background
             why_paragraph = ""
             if research_topics:
                 topics_phrase = self._format_topics_naturally(research_topics)
-                # Connect to student's interests naturally
-                if student_interests:
-                    main_interest = student_interests[0].lower() if student_interests else student_major.lower()
-                    why_paragraph = f"I am particularly drawn to your work on {topics_phrase}. As someone deeply interested in {main_interest}, I find the intersection of your research with real-world applications especially compelling."
+                # Try to connect research to student's interests or experience
+                if student_interests and student_experience:
+                    main_interest = student_interests[0].lower()
+                    why_paragraph = f"Your work on {topics_phrase} caught my attention because it aligns with my interest in {main_interest}. Having worked in related areas, I'm excited by the potential to apply my background to meaningful research."
+                elif student_interests:
+                    main_interest = student_interests[0].lower()
+                    why_paragraph = f"I'm drawn to your work on {topics_phrase} because of my strong interest in {main_interest}. The way your research tackles real-world problems resonates with the kind of impact I hope to make."
                 else:
-                    why_paragraph = f"I am particularly drawn to your work on {topics_phrase}, and I am eager to contribute to research that pushes the boundaries of this field."
+                    why_paragraph = f"Your work on {topics_phrase} stood out to me as I explore research opportunities in {student_major.lower()}. I'm eager to contribute to work that pushes boundaries in this field."
             else:
-                # Use project title if no topics extracted
-                why_paragraph = f"After reading about \"{project_title},\" I was excited by the opportunity to contribute to research that aligns with my academic interests and career goals."
+                why_paragraph = f"After reading about \"{project_title},\" I was excited by the opportunity to contribute to research that connects to my background in {student_major.lower()}."
 
-            # Build qualifications paragraph - specific and relevant
+            # Build qualifications paragraph - SPECIFIC and connected to the project
             qual_paragraph = ""
-            if student_skills and student_experience:
-                # Connect skills to experience
+            if student_experience and student_skills:
+                # Lead with experience, then connect skills
+                exp_clean = self._truncate_at_sentence(student_experience, 180)
                 skills_phrase = self._format_topics_naturally(student_skills[:3])
-                exp_clean = self._truncate_at_sentence(student_experience, 150)
-                qual_paragraph = f"Through my experience—{exp_clean}—I have developed proficiency in {skills_phrase}. I am confident these skills would allow me to contribute meaningfully to your research while continuing to grow as a researcher."
-            elif student_skills:
-                skills_phrase = self._format_topics_naturally(student_skills[:3])
-                qual_paragraph = f"I have developed skills in {skills_phrase} through coursework and personal projects, and I am eager to apply them in a research setting. I am a quick learner who thrives on tackling challenging problems."
+                qual_paragraph = f"{exp_clean} Through this work, I developed strong skills in {skills_phrase}. I believe this hands-on experience would allow me to contribute meaningfully to your research from day one."
             elif student_experience:
-                exp_clean = self._truncate_at_sentence(student_experience, 200)
-                qual_paragraph = f"My background includes {exp_clean} I believe this experience has prepared me well for the rigors of academic research."
+                # Experience but no skills listed - focus on what they did
+                exp_clean = self._truncate_at_sentence(student_experience, 220)
+                qual_paragraph = f"{exp_clean} This experience taught me how to work independently, solve complex problems, and deliver results—skills I'm eager to bring to your lab."
+            elif student_skills:
+                # Skills but no experience - frame as project/coursework based
+                skills_phrase = self._format_topics_naturally(student_skills[:4])
+                qual_paragraph = f"Through coursework and personal projects, I've built proficiency in {skills_phrase}. While I'm still early in my research journey, I'm a quick learner who thrives on tackling challenging problems and would welcome the chance to grow under your mentorship."
             else:
-                qual_paragraph = f"As a {student_year} in {student_major}, I am eager to gain hands-on research experience. I am a dedicated learner who is not afraid to dive into unfamiliar territory."
+                # No skills or experience - emphasize eagerness and major
+                qual_paragraph = f"As a {student_year} in {student_major}, I'm eager to gain hands-on research experience. I'm a dedicated learner who isn't afraid to dive into unfamiliar territory, and I'd welcome the chance to develop new skills under your guidance."
 
-            # Create concise subject line
+            # Create concise subject line with student context
             subject_topic = research_topics[0] if research_topics else project_title
-            if len(subject_topic) > 40:
-                subject_topic = subject_topic[:37] + "..."
-            draft_subject = f"Undergraduate Interest in {subject_topic.title()} Research"
+            if len(subject_topic) > 35:
+                subject_topic = subject_topic[:32] + "..."
+            draft_subject = f"Penn {student_year} – Interest in {subject_topic.title()}"
 
             # Assemble the email naturally
             draft_body = f"""Dear Professor {prof_last_name},
 
-I am {student_name}, a {student_year} studying {student_major} at Penn. I came across your research through the CURF Research Directory and wanted to reach out about potential opportunities in your lab.
+I'm {student_name}, a {student_year} studying {student_major} at Penn. I found your research through the CURF Research Directory and wanted to reach out about potential opportunities in your lab.
 
 {why_paragraph}
 
 {qual_paragraph}
 
-I would love the chance to discuss your current projects and how I might contribute. Would you have 15 minutes for a brief conversation at your convenience?
+I'd love the chance to discuss your current projects and how I might contribute. Would you have 15 minutes for a brief conversation at your convenience?
 
-Thank you for your time and consideration.
+Thank you for your time.
 
 Best regards,
 {student_name}"""
