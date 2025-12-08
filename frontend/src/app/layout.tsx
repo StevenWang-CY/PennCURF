@@ -4,6 +4,7 @@ import "./globals.css";
 import { ProfileProvider } from "@/contexts/ProfileContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import NavBar from "@/components/NavBar";
+import BackendWakeUp from "@/components/BackendWakeUp";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,6 +21,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.className} antialiased bg-[var(--background)] min-h-screen flex flex-col`}>
+        <BackendWakeUp />
         <AuthProvider>
           <ProfileProvider>
             <NavBar />

@@ -64,7 +64,8 @@ PennCURF/
 │       │       └── register/page.tsx
 │       ├── components/
 │       │   ├── NavBar.tsx          # Navigation component
-│       │   └── ProtectedRoute.tsx  # Auth route guard
+│       │   ├── ProtectedRoute.tsx  # Auth route guard
+│       │   └── BackendWakeUp.tsx   # Cold start wake-up ping
 │       ├── contexts/
 │       │   ├── AuthContext.tsx     # Authentication state
 │       │   └── ProfileContext.tsx  # Profile state
@@ -144,6 +145,14 @@ The application is deployed on free-tier cloud services:
 | Frontend | Vercel | [penn-curf.vercel.app](https://penn-curf.vercel.app) |
 | Backend | Render | [penncurf-api.onrender.com](https://penncurf-api.onrender.com) |
 | Database | Supabase | Managed PostgreSQL |
+
+### Cold Start Optimization
+
+Render's free tier spins down after ~15 minutes of inactivity, causing 30-60 second cold starts. Two mitigations are in place:
+
+1. **Frontend Wake-up Ping**: The `BackendWakeUp` component pings `/health` on page load, starting the wake-up process before user interaction.
+
+2. **External Cron Job** (recommended): Use a free service like [cron-job.org](https://cron-job.org) to ping `https://penncurf-api.onrender.com/health` every 14 minutes to keep the backend warm.
 
 ### Deploy Your Own
 
