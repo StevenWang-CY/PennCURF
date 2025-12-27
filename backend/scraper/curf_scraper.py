@@ -48,11 +48,14 @@ class CURFScraper:
             raise ValueError("CURF_SESSION_COOKIE not found in environment variables")
 
         # Set cookies
-        self.session.cookies.set(
-            "SSESSe9cabe4b674b11edf21ca1046f3451bf",
-            self.session_cookie.split("=")[1] if "=" in self.session_cookie else self.session_cookie,
-            domain="curf.upenn.edu"
-        )
+        if ";" in self.session_cookie:
+            self.session.headers.update({"Cookie": self.session_cookie})
+        else:
+            self.session.cookies.set(
+                "SSESSe9cabe4b674b11edf21ca1046f3451bf",
+                self.session_cookie.split("=")[1] if "=" in self.session_cookie else self.session_cookie,
+                domain="curf.upenn.edu"
+            )
 
         # Set headers
         self.session.headers.update({

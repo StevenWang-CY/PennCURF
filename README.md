@@ -7,7 +7,7 @@ An AI-powered platform for University of Pennsylvania students to discover, anal
 ## Features
 
 ### Smart Search & Discovery
-- **Natural Language Understanding**: Uses multi-stage semantic search with term expansion, stemming, and category mapping to understand query intent
+- **Natural Language Understanding**: Uses multi-stage semantic search with term expansion, stemming, and category mapping to understand query intent across all disciplines (STEM, Humanities, Social Sciences, Business, etc.)
 - **Soft Pre-filtering**: TF-IDF-like scoring with semantic matching ranks opportunities before LLM refinement
 - **Advanced Filtering**: Filter by research category, student year, and compensation type (paid/volunteer/work-study)
 
@@ -194,6 +194,9 @@ JWT_SECRET_KEY=your-secret-key-change-in-production
 
 # CORS (production frontend URL)
 FRONTEND_URL=https://your-app.vercel.app
+
+# Optional: Scraper
+CURF_SESSION_COOKIE="raw_cookie_string_from_browser"
 ```
 
 **Frontend (`frontend/.env.local`):**
@@ -225,7 +228,7 @@ To populate the database with CURF opportunities:
 cd backend
 python scraper/curf_scraper.py
 ```
-Requires valid `CURF_SESSION_COOKIE` environment variable from an authenticated Penn browser session.
+Requires `CURF_SESSION_COOKIE` in your `.env`. You can paste the full raw cookie string from your browser's developer tools (Network tab -> request headers -> Cookie).
 
 ## Usage
 

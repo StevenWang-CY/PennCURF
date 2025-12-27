@@ -34,59 +34,145 @@ class LLMService:
 
         # Semantic category mappings (query term → research categories that are relevant)
         category_mappings = {
+            # Engineering & Computing
             'software': ['Engineering and Computing'],
             'programming': ['Engineering and Computing'],
             'web': ['Engineering and Computing'],
-            'website': ['Engineering and Computing'],
             'app': ['Engineering and Computing'],
             'code': ['Engineering and Computing'],
             'coding': ['Engineering and Computing'],
             'developer': ['Engineering and Computing'],
             'development': ['Engineering and Computing'],
             'computer': ['Engineering and Computing'],
-            'data': ['Engineering and Computing', 'Biomedical Science', 'Mathematics and Applied Mathematics'],
+            'data': ['Engineering and Computing', 'Biomedical Science', 'Mathematics and Applied Mathematics', 'Business and Economics'],
             'machine': ['Engineering and Computing'],
             'ml': ['Engineering and Computing'],
             'ai': ['Engineering and Computing'],
+            'robotics': ['Engineering and Computing'],
+            'cybersecurity': ['Engineering and Computing'],
+            'systems': ['Engineering and Computing'],
+
+            # Biomedical Science & Health
             'healthcare': ['Biomedical Science', 'Nursing'],
-            'medical': ['Biomedical Science'],
-            'health': ['Biomedical Science', 'Nursing'],
+            'medical': ['Biomedical Science', 'Nursing'],
+            'health': ['Biomedical Science', 'Nursing', 'Social Science'],
             'biology': ['Biomedical Science', 'Physical and Natural Sciences'],
-            'chemistry': ['Physical and Natural Sciences'],
-            'physics': ['Physical and Natural Sciences'],
+            'genetics': ['Biomedical Science'],
+            'neuroscience': ['Biomedical Science', 'Social Science'],
+            'cancer': ['Biomedical Science'],
+            'clinical': ['Biomedical Science', 'Nursing'],
+            'immunology': ['Biomedical Science'],
+            'pharmacy': ['Biomedical Science'],
+            'public': ['Biomedical Science', 'Social Science', 'Nursing'],
+
+            # Physical & Natural Sciences
+            'chemistry': ['Physical and Natural Sciences', 'Biomedical Science'],
+            'physics': ['Physical and Natural Sciences', 'Engineering and Computing'],
+            'environment': ['Physical and Natural Sciences', 'Social Science'],
+            'climate': ['Physical and Natural Sciences', 'Social Science'],
+            'sustainability': ['Physical and Natural Sciences', 'Engineering and Computing', 'Business and Economics'],
+            'geology': ['Physical and Natural Sciences'],
+            'astronomy': ['Physical and Natural Sciences'],
+            'materials': ['Physical and Natural Sciences', 'Engineering and Computing'],
+            'energy': ['Physical and Natural Sciences', 'Engineering and Computing'],
+
+            # Math & Stats
             'math': ['Mathematics and Applied Mathematics'],
-            'statistics': ['Mathematics and Applied Mathematics'],
+            'mathematics': ['Mathematics and Applied Mathematics'],
+            'statistics': ['Mathematics and Applied Mathematics', 'Business and Economics', 'Social Science'],
+            'quantitative': ['Mathematics and Applied Mathematics', 'Business and Economics', 'Social Science'],
+
+            # Business & Economics
             'economics': ['Business and Economics', 'Social Science'],
             'business': ['Business and Economics'],
             'finance': ['Business and Economics'],
-            'psychology': ['Social Science'],
+            'marketing': ['Business and Economics', 'Social Science'],
+            'management': ['Business and Economics'],
+            'entrepreneurship': ['Business and Economics'],
+            'accounting': ['Business and Economics'],
+            'policy': ['Business and Economics', 'Social Science'],
+
+            # Social Science
+            'psychology': ['Social Science', 'Biomedical Science'],
             'sociology': ['Social Science'],
             'politics': ['Social Science'],
+            'political': ['Social Science'],
+            'government': ['Social Science'],
+            'anthropology': ['Social Science', 'Humanities'],
+            'linguistics': ['Social Science', 'Humanities'],
+            'education': ['Social Science'],
+            'urban': ['Social Science', 'Arts'],
+            'criminology': ['Social Science'],
+            'law': ['Social Science', 'Business and Economics'],
+            'legal': ['Social Science'],
+
+            # Humanities
             'history': ['Humanities'],
             'literature': ['Humanities'],
             'writing': ['Humanities', 'Arts'],
+            'english': ['Humanities'],
+            'philosophy': ['Humanities'],
+            'religion': ['Humanities'],
+            'classics': ['Humanities'],
+            'language': ['Humanities', 'Social Science'],
+            'culture': ['Humanities', 'Social Science'],
+            'ethics': ['Humanities', 'Social Science', 'Biomedical Science'],
+
+            # Arts & Design
             'art': ['Arts'],
+            'arts': ['Arts'],
             'music': ['Arts'],
             'design': ['Arts', 'Engineering and Computing'],
+            'architecture': ['Arts', 'Engineering and Computing'],
+            'theater': ['Arts'],
+            'film': ['Arts', 'Humanities'],
+            'media': ['Arts', 'Social Science', 'Humanities'],
+            'visual': ['Arts'],
         }
 
         # Semantic expansion (related terms that should also match)
         semantic_expansions = {
-            'website': ['web', 'frontend', 'react', 'javascript', 'html', 'ui', 'ux', 'app', 'application', 'interface', 'site'],
-            'web': ['website', 'frontend', 'react', 'javascript', 'html', 'fullstack', 'full-stack', 'app', 'browser'],
-            'software': ['programming', 'developer', 'engineering', 'code', 'coding', 'app', 'application', 'build'],
-            'development': ['developer', 'developing', 'build', 'building', 'create', 'creating', 'implement', 'engineer'],
-            'frontend': ['web', 'react', 'javascript', 'ui', 'ux', 'html', 'css', 'interface', 'design'],
-            'backend': ['server', 'api', 'database', 'python', 'node', 'java', 'infrastructure', 'cloud'],
-            'machine': ['ml', 'ai', 'deep', 'neural', 'learning', 'model', 'algorithm'],
-            'learning': ['ml', 'ai', 'machine', 'neural', 'deep', 'model', 'training'],
-            'ml': ['machine', 'ai', 'deep', 'neural', 'model', 'algorithm', 'prediction'],
-            'ai': ['artificial', 'intelligence', 'machine', 'ml', 'neural', 'deep', 'model', 'gpt', 'llm'],
-            'data': ['analytics', 'analysis', 'science', 'statistics', 'database', 'visualization', 'processing'],
-            'chatbot': ['chat', 'bot', 'conversational', 'nlp', 'gpt', 'llm', 'dialogue', 'assistant'],
-            'nlp': ['natural', 'language', 'processing', 'text', 'chatbot', 'gpt', 'llm', 'linguistic'],
-            'healthcare': ['health', 'medical', 'clinical', 'patient', 'hospital', 'medicine', 'care'],
-            'biology': ['biological', 'biomedical', 'genomics', 'cell', 'molecular', 'genetics'],
+            # Tech
+            'website': ['web', 'frontend', 'react', 'javascript', 'html', 'ui', 'ux', 'app', 'site'],
+            'software': ['programming', 'developer', 'engineering', 'code', 'coding', 'app', 'python', 'java', 'cpp'],
+            'data': ['analytics', 'analysis', 'statistics', 'science', 'database', 'visualization', 'sql', 'modeling'],
+            'ai': ['artificial', 'intelligence', 'machine', 'ml', 'neural', 'deep', 'model', 'gpt', 'llm', 'nlp'],
+            
+            # Health / Bio
+            'healthcare': ['medical', 'clinical', 'hospital', 'patient', 'health', 'medicine', 'public', 'epidemiology'],
+            'biology': ['biological', 'biomedical', 'genomics', 'molecular', 'cell', 'organism', 'ecology', 'lab'],
+            'neuroscience': ['brain', 'neural', 'cognitive', 'psychology', 'behavior', 'nervous', 'mental'],
+            'genetics': ['genomics', 'dna', 'gene', 'sequencing', 'heredity', 'molecular'],
+            
+            # Physical
+            'environment': ['climate', 'sustainability', 'ecology', 'green', 'energy', 'conservation', 'earth', 'atmospheric'],
+            'chemistry': ['chemical', 'molecular', 'reaction', 'synthesis', 'drug', 'organic', 'inorganic', 'lab'],
+            'physics': ['quantum', 'mechanics', 'optics', 'astrophysics', 'matter', 'materials', 'thermodynamics'],
+            
+            # Social Science
+            'psychology': ['mental', 'cognitive', 'behavioral', 'social', 'developmental', 'brain', 'child', 'clinical'],
+            'sociology': ['social', 'society', 'culture', 'demographic', 'inequality', 'community', 'urban'],
+            'politics': ['political', 'government', 'policy', 'international', 'relations', 'democracy', 'election'],
+            'anthropology': ['culture', 'human', 'ethnography', 'archaeology', 'social', 'evolution'],
+            'policy': ['government', 'law', 'regulation', 'public', 'economic', 'social', 'reform'],
+            
+            # Humanities
+            'history': ['historical', 'archive', 'past', 'ancient', 'modern', 'civilization', 'era'],
+            'philosophy': ['ethics', 'logic', 'metaphysics', 'moral', 'theory', 'epistemology', 'political'],
+            'literature': ['literary', 'book', 'novel', 'text', 'english', 'writing', 'narrative', 'poetry'],
+            'culture': ['cultural', 'society', 'art', 'history', 'media', 'identity', 'global'],
+            
+            # Business
+            'business': ['finance', 'marketing', 'management', 'economics', 'entrepreneurship', 'strategy', 'corporate'],
+            'finance': ['financial', 'market', 'investment', 'economic', 'banking', 'capital', 'asset'],
+            'economics': ['econometric', 'market', 'policy', 'microeconomics', 'macroeconomics', 'behavioral', 'finance'],
+            'marketing': ['advertising', 'consumer', 'brand', 'digital', 'social', 'media', 'communications'],
+            
+            # Arts
+            'art': ['visual', 'design', 'museum', 'curatorial', 'history', 'creative', 'studio', 'fine'],
+            'design': ['graphic', 'interaction', 'ui', 'ux', 'product', 'visual', 'architecture', 'creative'],
+            'film': ['cinema', 'movie', 'video', 'media', 'production', 'screen', 'visual'],
+            'music': ['sound', 'audio', 'composition', 'performance', 'instrument', 'theory', 'sonic'],
         }
 
         # Word stems (common suffixes to strip for matching)
