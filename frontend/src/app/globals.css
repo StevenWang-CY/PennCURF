@@ -1,25 +1,72 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f8fafc; /* Slate 50 - Softer than pure white */
-  --foreground: #0f172a; /* Slate 900 - Softer than pure black */
-  
-  /* Delicate Palette */
+  /* Penn Identity Palette */
+  --penn-blue: #011F5B;
+  --penn-red: #990000;
+
+  --color-primary: var(--penn-blue);
+  --color-primary-soft: rgba(1, 31, 91, 0.08);
+  /* Penn Blue at 8% opacity */
+
+  --color-accent: var(--penn-red);
+  --color-accent-soft: rgba(153, 0, 0, 0.08);
+  /* Penn Red at 8% opacity */
+
   --color-surface: #ffffff;
-  --color-surface-highlight: #f1f5f9;
-  
-  --color-primary: #011F5B;
-  --color-primary-soft: #e0e7ff;
-  
-  --color-accent: #990000;
-  --color-accent-soft: #fee2e2;
+  --color-surface-hover: #fafafa;
+  --color-surface-highlight: #f8fafc;
+
+  --color-text-secondary: #64748b;
+  /* Slate 500 */
+  --color-text-tertiary: #94a3b8;
+  /* Slate 400 */
+
+  --border-subtle: rgba(0, 0, 0, 0.05);
+  --border-focus: rgba(1, 31, 91, 0.15);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans); /* Will fallback to Inter via layout */
+  --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  /* Extend spacing for "Delicate" breathing room */
+  --spacing-18: 4.5rem;
+
+  /* Custom Shadows for 3D Lift */
+  --shadow-layered:
+    0 2px 4px -1px rgba(0, 0, 0, 0.06),
+    0 4px 6px -1px rgba(0, 0, 0, 0.04),
+    0 12px 24px -4px rgba(0, 0, 0, 0.04);
+
+  --shadow-layered-hover:
+    0 4px 6px -1px rgba(0, 0, 0, 0.06),
+    0 10px 15px -3px rgba(0, 0, 0, 0.06),
+    0 25px 50px -12px rgba(0, 0, 0, 0.08);
+
+  --backdrop-blur-xs: 2px;
+
+  --animate-blob: blob 7s infinite;
+}
+
+@keyframes blob {
+  0% {
+    transform: translate(0px, 0px) scale(1);
+  }
+
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
 }
 
 @media (prefers-color-scheme: dark) {
@@ -33,6 +80,32 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), system-ui, sans-serif;
+  letter-spacing: -0.01em;
+  /* Slightly tighter body text for modern look */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Base Styles for "Impressive" Feel */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  letter-spacing: -0.02em;
+  /* Tighter headings */
+}
+
+/* Utility for delicate borders */
+.border-delicate {
+  border: 1px solid var(--border-subtle);
+}
+
+/* Glassmorphism Utility */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
 }
