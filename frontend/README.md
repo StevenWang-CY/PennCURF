@@ -1,21 +1,22 @@
 # Penn CURF Research Finder - Frontend
 
-A modern Next.js application that helps Penn students discover undergraduate research opportunities and connect with faculty researchers through AI-powered matching and personalized cold email generation.
+A Next.js application that helps Penn students discover undergraduate research opportunities and connect with faculty researchers through AI-powered matching and personalized cold email generation.
 
 ## Features
 
 ### Core Functionality
-- **AI-Powered Search**: Natural language queries to find relevant research opportunities with match scores and explanations
+- **AI-Powered Search**: Natural language queries with match scores and explanations
 - **Smart Filtering**: Browse by research category, student year, and compensation type
 - **Personalized Matching**: Results ranked based on your profile, interests, and skills
 - **Cold Email Generator**: AI-generated personalized outreach emails with revision capabilities
 - **Skill Compatibility Analysis**: See how your skills match opportunity requirements
 
 ### User Experience
-- **Profile Builder**: Multi-section form with progress tracking (basic info, interests, skills, experience, resume)
-- **Smart Routing**: Automatic redirects based on authentication and profile completion status
+- **Profile Builder**: Multi-section form with progress tracking
+- **Smart Routing**: Automatic redirects based on authentication and profile status
 - **Cross-Tab Sync**: Profile changes synchronize across browser tabs
-- **Responsive Design**: Optimized for desktop and mobile devices
+- **Cold Start Handling**: Visual status indicators when backend is waking up
+- **Responsive Design**: Optimized for desktop and mobile
 
 ## Tech Stack
 
@@ -24,7 +25,7 @@ A modern Next.js application that helps Penn students discover undergraduate res
 | Framework | Next.js 16 (App Router) |
 | Language | TypeScript 5 |
 | Styling | Tailwind CSS v4 |
-| UI Components | Radix UI (Select, Checkbox, Label) |
+| UI Components | Radix UI |
 | Icons | Lucide React |
 | State Management | React Context API |
 | Deployment | Vercel |
@@ -35,35 +36,40 @@ A modern Next.js application that helps Penn students discover undergraduate res
 src/
 ├── app/                              # Next.js App Router pages
 │   ├── layout.tsx                    # Root layout with providers
-│   ├── page.tsx                      # Homepage with hero section
-│   ├── globals.css                   # Global styles and Tailwind imports
+│   ├── page.tsx                      # Landing page
+│   ├── globals.css                   # Global styles
 │   ├── auth/
 │   │   ├── login/page.tsx            # User login
 │   │   └── register/page.tsx         # User registration
 │   ├── search/page.tsx               # Research opportunity search
 │   ├── profile/page.tsx              # Student profile management
 │   └── opportunity/[id]/page.tsx     # Opportunity detail view
+│
 ├── components/
 │   ├── NavBar.tsx                    # Navigation with auth-aware routing
-│   └── ProtectedRoute.tsx            # Authentication wrapper component
+│   ├── ProtectedRoute.tsx            # Authentication wrapper
+│   └── BackendWakeUp.tsx             # Cold start status banner
+│
 ├── contexts/
 │   ├── AuthContext.tsx               # Authentication state management
-│   └── ProfileContext.tsx            # Student profile state management
+│   ├── ProfileContext.tsx            # Student profile state
+│   └── BackendStatusContext.tsx      # Backend health tracking
+│
 └── lib/
     ├── api.ts                        # API client with typed endpoints
-    └── utils.ts                      # Utility functions (cn for classnames)
+    └── utils.ts                      # Utility functions
 ```
 
-## Pages Overview
+## Pages
 
 | Route | Description |
 |-------|-------------|
-| `/` | Landing page with hero, features showcase, and CTAs |
-| `/auth/login` | User authentication with username/password |
-| `/auth/register` | New user registration (Penn students only) |
-| `/search` | Discover opportunities via AI search or filters |
-| `/profile` | Create/edit student profile with interests and skills |
-| `/opportunity/[id]` | View full opportunity details and generate emails |
+| `/` | Landing page with hero and feature showcase |
+| `/auth/login` | User authentication |
+| `/auth/register` | New user registration (Penn students) |
+| `/search` | AI search and filtered browsing |
+| `/profile` | Create/edit student profile |
+| `/opportunity/[id]` | View details and generate emails |
 
 ## Getting Started
 
@@ -74,17 +80,14 @@ src/
 ### Installation
 
 ```bash
-# Clone the repository
 git clone <repository-url>
 cd frontend
-
-# Install dependencies
 npm install
 ```
 
 ### Environment Setup
 
-Create a `.env.local` file in the frontend directory:
+Create `.env.local`:
 
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:8000
@@ -93,103 +96,77 @@ NEXT_PUBLIC_API_URL=http://localhost:8000
 ### Development
 
 ```bash
-# Start the development server
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to view the application.
+Open [http://localhost:3000](http://localhost:3000)
 
 ### Production Build
 
 ```bash
-# Create production build
 npm run build
-
-# Start production server
 npm run start
 ```
-
-## API Integration
-
-The frontend communicates with a FastAPI backend. Key API modules:
-
-| Module | Endpoints |
-|--------|-----------|
-| **Opportunities** | List all, get by ID, filter options |
-| **Search** | AI-powered natural language search with ranking |
-| **Profile** | Create, read, update student profiles |
-| **Email** | Generate personalized cold emails |
-| **Skills** | Analyze skill compatibility with opportunities |
-| **Saved** | Save/unsave opportunities for later |
-
-All API calls include automatic JWT token injection for authenticated requests.
-
-## Styling
-
-The application uses Penn's official brand colors:
-
-| Color | Hex | Usage |
-|-------|-----|-------|
-| Penn Blue | `#011F5B` | Primary backgrounds, headers |
-| Secondary Blue | `#003366` | Gradients, accents |
-| Penn Red | `#990000` | Accent buttons, highlights |
-| Light Background | `#f8fafc` | Page backgrounds |
-
-Key design elements:
-- Inter font family via Google Fonts
-- Rounded cards with subtle shadows
-- Gradient hero sections
-- Responsive grid layouts with Tailwind breakpoints
 
 ## State Management
 
 ### AuthContext
-Manages user authentication state including:
 - Login/logout functionality
 - JWT token storage in localStorage
 - Token refresh handling
-- Custom events for auth state changes
+- Auth state change events
 
 ### ProfileContext
-Manages student profile data with:
-- Cross-tab synchronization via BroadcastChannel
-- Auto-sync with AuthContext user data
-- localStorage persistence as fallback
+- Cross-tab sync via BroadcastChannel
+- Auto-sync with AuthContext
+- localStorage persistence fallback
 
-## Deployment
+### BackendStatusContext
+- Tracks backend health status (`checking`, `waking`, `ready`, `error`)
+- Retry logic with exponential backoff
+- Keep-alive pings every 10 minutes
+- Visibility-aware (pings when tab becomes active)
 
-The application is configured for Vercel deployment:
+## Cold Start Optimization
 
-```bash
-# Deploy to Vercel
-vercel
-```
+The app handles Render's free tier cold starts (30-60s) with:
 
-The `vercel.json` configuration handles:
-- Next.js framework detection
-- Build commands
-- Output directory settings
+1. **Status Banner**: Shows at page top during wake-up
+2. **Form Protection**: Login/register disabled until backend ready
+3. **Automatic Retries**: 5 attempts with exponential backoff
+4. **Keep-Alive**: Pings `/health` every 10 minutes
+5. **Tab Awareness**: Pings when user returns to tab
+
+## Styling
+
+Penn brand colors:
+
+| Color | Hex | Usage |
+|-------|-----|-------|
+| Penn Blue | `#011F5B` | Primary backgrounds |
+| Secondary Blue | `#003366` | Gradients, accents |
+| Penn Red | `#990000` | Accent highlights |
+| Light Background | `#f8fafc` | Page backgrounds |
 
 ## Scripts
 
 | Command | Description |
 |---------|-------------|
-| `npm run dev` | Start development server on port 3000 |
-| `npm run build` | Create optimized production build |
-| `npm run start` | Run production server |
-| `npm run lint` | Run ESLint checks |
+| `npm run dev` | Development server (port 3000) |
+| `npm run build` | Production build |
+| `npm run start` | Production server |
+| `npm run lint` | ESLint checks |
 
 ## Dependencies
 
 ### Production
-- `react` / `react-dom` - React 19.2
+- `react` / `react-dom` - React 19
 - `next` - Next.js 16
 - `@radix-ui/*` - Accessible UI primitives
-- `lucide-react` - Icon library
-- `class-variance-authority` - Component variants
-- `clsx` / `tailwind-merge` - Class name utilities
+- `lucide-react` - Icons
+- `clsx` / `tailwind-merge` - Class utilities
 
 ### Development
 - `typescript` - Type safety
-- `tailwindcss` - Utility-first CSS
-- `eslint` / `eslint-config-next` - Code linting
+- `tailwindcss` - Styling
+- `eslint` - Linting
