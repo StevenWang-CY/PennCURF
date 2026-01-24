@@ -116,10 +116,11 @@ function SearchContent() {
       </div>
 
       <div className="relative z-10 max-w-6xl mx-auto space-y-8 pt-8 px-4">
-        <div className="flex flex-col md:flex-row justify-between items-end gap-6 border-b border-[var(--border-subtle)] pb-6 bg-white/40 backdrop-blur-sm rounded-2xl p-6 shadow-sm border border-white/50">
+        {/* Header with strong glassmorphism for readability */}
+        <div className="flex flex-col md:flex-row justify-between items-end gap-6 border-b border-[var(--border-subtle)] pb-8 bg-white/80 backdrop-blur-md rounded-[2rem] p-8 shadow-sm border border-white/60">
           <div>
-            <h1 className="text-3xl font-bold text-[#011F5B] tracking-tight">Research Opportunities</h1>
-            <p className="text-[var(--color-text-secondary)] mt-2 text-base font-light tracking-wide">
+            <h1 className="text-4xl font-bold text-[#011F5B] tracking-tight drop-shadow-sm">Research Opportunities</h1>
+            <p className="text-[#1a1a1a] mt-3 text-lg font-normal tracking-wide leading-relaxed">
               {searchResults.length > 0
                 ? `Found ${searchResults.length} matching opportunities`
                 : `Browse ${opportunities.length} research opportunities`}
@@ -128,7 +129,7 @@ function SearchContent() {
           {!hasProfile && (
             <Link
               href="/profile"
-              className="px-5 py-2.5 bg-[#011F5B]/5 text-[#011F5B] rounded-full text-sm font-semibold hover:bg-[#011F5B] hover:text-white transition-all shadow-sm border border-[#011F5B]/10 hover:shadow-md"
+              className="px-6 py-3 bg-[#011F5B] text-white rounded-full text-sm font-semibold hover:bg-[#003366] transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5"
             >
               Create Profile for Better Results
             </Link>
@@ -136,7 +137,7 @@ function SearchContent() {
         </div>
 
         {/* Search Interface */}
-        <div className="bg-white rounded-[2rem] shadow-layered border border-[var(--border-subtle)] p-2">
+        <div className="bg-white/90 backdrop-blur-xl rounded-[2.5rem] shadow-layered border border-white/60 p-3 ring-1 ring-black/[0.03]">
           {/* Toggle - Segmented Control */}
           <div className="flex p-1 bg-gray-50 rounded-[1.5rem] mb-6 w-fit mx-auto sm:mx-0 sm:ml-6 mt-6 border border-gray-100">
             <button
