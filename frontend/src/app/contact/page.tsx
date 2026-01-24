@@ -28,21 +28,8 @@ export default function ContactPage() {
                     <div className="bg-white/80 backdrop-blur-xl rounded-[2rem] shadow-sm border border-white/60 p-10 ring-1 ring-black/[0.03] flex flex-col justify-center">
                         <div className="space-y-6">
                             <div>
-                                <h3 className="text-xl font-bold text-[#011F5B] mb-2">General Inquiries</h3>
-                                <p className="text-gray-600 font-light">curf@upenn.edu</p>
-                            </div>
-                            <div>
-                                <h3 className="text-xl font-bold text-[#011F5B] mb-2">Office</h3>
-                                <p className="text-gray-600 font-light">
-                                    Center for Undergraduate Research & Fellowships<br />
-                                    University of Pennsylvania<br />
-                                    3539 Locust Walk<br />
-                                    Philadelphia, PA 19104
-                                </p>
-                            </div>
-                            <div>
-                                <h3 className="text-xl font-bold text-[#011F5B] mb-2">Hours</h3>
-                                <p className="text-gray-600 font-light">Monday - Friday: 9am - 5pm EST</p>
+                                <h3 className="text-xl font-bold text-[#011F5B] mb-2">Developer</h3>
+                                <p className="text-gray-600 font-light">wangcy07@sas.upenn.edu</p>
                             </div>
                         </div>
                     </div>
