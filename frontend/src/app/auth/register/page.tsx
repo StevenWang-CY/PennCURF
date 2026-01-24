@@ -4,10 +4,12 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
+import { useBackendStatus } from '@/contexts/BackendStatusContext';
 
 export default function RegisterPage() {
   const router = useRouter();
   const { register, isAuthenticated, isLoading } = useAuth();
+  const { isReady: isBackendReady, status: backendStatus } = useBackendStatus();
 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -175,13 +177,25 @@ export default function RegisterPage() {
             </div>
           )}
 
+          {/* Backend Status Notice */}
+          {!isBackendReady && (
+            <div className="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded-xl text-sm flex items-center gap-2">
+              <div className="animate-spin rounded-full h-4 w-4 border-2 border-blue-600 border-t-transparent"></div>
+              <span>
+                {backendStatus === 'checking' && 'Connecting to server...'}
+                {backendStatus === 'waking' && 'Server is waking up. Registration will be available shortly...'}
+                {backendStatus === 'error' && 'Server is unavailable. Please try again later.'}
+              </span>
+            </div>
+          )}
+
           {/* Submit Button */}
           <button
             type="submit"
-            disabled={isSubmitting}
+            disabled={isSubmitting || !isBackendReady}
             className="w-full py-3 bg-[#011F5B] text-white rounded-xl font-semibold hover:bg-[#012a7a] transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isSubmitting ? 'Creating Account...' : 'Create Account'}
+            {!isBackendReady ? 'Waiting for server...' : isSubmitting ? 'Creating Account...' : 'Create Account'}
           </button>
 
           {/* Login Link */}
