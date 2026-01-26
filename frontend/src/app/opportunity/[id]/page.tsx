@@ -175,7 +175,7 @@ function OpportunityDetailContent({ params }: PageProps) {
           <div className="lg:col-span-8 space-y-24">
             {opportunity.description && (
               <section>
-                <h3 className="text-xs font-bold uppercase tracking-widest text-gray-600 mb-8 flex items-center gap-3">
+                <h3 className="text-sm font-bold uppercase tracking-widest text-gray-600 mb-8 flex items-center gap-3">
                   <span className="w-8 h-[1px] bg-gray-300"></span> Project Overview
                 </h3>
                 <div className="prose prose-lg md:prose-xl  text-gray-800 leading-[1.8] max-w-none">
@@ -186,7 +186,7 @@ function OpportunityDetailContent({ params }: PageProps) {
 
             {opportunity.mentor_areas && (
               <section>
-                <h3 className="text-xs font-bold uppercase tracking-widest text-gray-600 mb-8 flex items-center gap-3">
+                <h3 className="text-sm font-bold uppercase tracking-widest text-gray-600 mb-8 flex items-center gap-3">
                   <span className="w-8 h-[1px] bg-gray-300"></span> Research Areas
                 </h3>
                 <div className="prose prose-lg  text-gray-800 leading-[1.8]">
@@ -197,7 +197,7 @@ function OpportunityDetailContent({ params }: PageProps) {
 
             {opportunity.preferred_qualifications && cleanScrapedText(opportunity.preferred_qualifications) && (
               <section>
-                <h3 className="text-xs font-bold uppercase tracking-widest text-gray-700 mb-8 flex items-center gap-3">
+                <h3 className="text-sm font-bold uppercase tracking-widest text-gray-700 mb-8 flex items-center gap-3">
                   <span className="w-8 h-[1px] bg-gray-300"></span> Qualifications
                 </h3>
                 <div className="prose prose-lg  text-gray-700 leading-[1.8] whitespace-pre-wrap">
@@ -208,15 +208,26 @@ function OpportunityDetailContent({ params }: PageProps) {
 
             {/* Skill Compatibility Section */}
             <section className="pt-12 border-t border-gray-200">
-              <h3 className="text-xs font-bold uppercase tracking-widest text-gray-700 mb-8 flex items-center gap-3">
+              <h3 className="text-sm font-bold uppercase tracking-widest text-gray-700 mb-8 flex items-center gap-3">
                 <span className="w-8 h-[1px] bg-gray-300"></span> Fit Analysis
               </h3>
-              <SkillAnalyzer opportunityId={id} />
+
+              <div className="bg-gray-50 rounded-3xl p-8 border border-gray-200 relative overflow-hidden group">
+                <div className="relative z-10">
+                  <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+                    <div>
+                      <h4 className="font-serif text-2xl text-[#011F5B] mb-2">Am I a good fit?</h4>
+                      <p className="text-gray-800 font-sans">Instantly analyze your compatibility based on your profile.</p>
+                    </div>
+                  </div>
+                  <SkillAnalyzer opportunityId={id} />
+                </div>
+              </div>
             </section>
 
             {/* Email Generator Section */}
             <section className="pt-12 border-t border-gray-200">
-              <h3 className="text-xs font-bold uppercase tracking-widest text-gray-700 mb-8 flex items-center gap-3">
+              <h3 className="text-sm font-bold uppercase tracking-widest text-gray-700 mb-8 flex items-center gap-3">
                 <span className="w-8 h-[1px] bg-gray-300"></span> Email Draft
               </h3>
 
@@ -248,7 +259,7 @@ function OpportunityDetailContent({ params }: PageProps) {
                       {/* Email Preview */}
                       <div className="space-y-4">
                         <div className="border-b border-gray-200 pb-4">
-                          <p className="text-xs font-bold uppercase tracking-widest text-gray-700 mb-1">Subject</p>
+                          <p className="text-sm font-bold uppercase tracking-widest text-gray-700 mb-1">Subject</p>
                           <div className="flex justify-between items-center bg-white p-3 rounded-lg border border-gray-200">
                             <p className="font-medium text-gray-900 truncate pr-2">{generatedEmail.subject}</p>
                             <button onClick={() => copyToClipboard(generatedEmail.subject, 'subject')} className="text-xs text-[#011F5B] font-bold hover:underline shrink-0">
@@ -257,7 +268,7 @@ function OpportunityDetailContent({ params }: PageProps) {
                           </div>
                         </div>
                         <div>
-                          <p className="text-xs font-bold uppercase tracking-widest text-gray-700 mb-2">Body</p>
+                          <p className="text-sm font-bold uppercase tracking-widest text-gray-700 mb-2">Body</p>
                           <div className="relative">
                             <textarea
                               value={generatedEmail.body}
@@ -291,7 +302,7 @@ function OpportunityDetailContent({ params }: PageProps) {
           <div className="lg:col-span-4 space-y-16 lg:sticky lg:top-24 h-fit">
             {/* Contact Info (Clean) */}
             <div className="space-y-6">
-              <h3 className="text-xs font-bold uppercase tracking-widest text-gray-700">Researcher Contact</h3>
+              <h3 className="text-sm font-bold uppercase tracking-widest text-gray-700">Researcher Contact</h3>
               <div className="space-y-2">
                 {opportunity.researcher_email ? (
                   <div className="group flex items-center gap-3">
@@ -319,7 +330,7 @@ function OpportunityDetailContent({ params }: PageProps) {
 
             {/* Requirements Pills */}
             <div className="space-y-6">
-              <h3 className="text-xs font-bold uppercase tracking-widest text-gray-700">Target Students</h3>
+              <h3 className="text-sm font-bold uppercase tracking-widest text-gray-700">Target Students</h3>
               <div className="flex flex-wrap gap-2">
                 {opportunity.preferred_student_years?.map(y => (
                   <span key={y} className="px-3 py-1 border border-gray-200 text-gray-700 text-[11px] font-bold uppercase tracking-widest rounded-full">
@@ -367,14 +378,17 @@ function SkillAnalyzer({ opportunityId }: SkillAnalyzerProps) {
       <button
         onClick={handleAnalyze}
         disabled={analyzing}
-        className="w-full py-3 px-4 bg-white border border-gray-200 rounded-xl text-sm font-bold text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all flex items-center justify-center gap-2 group"
+        className="w-full py-4 bg-white border border-gray-200 text-[#011F5B] rounded-xl font-bold text-lg hover:bg-gray-50 hover:shadow-lg hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 shadow-sm"
       >
         {analyzing ? (
-          <div className="w-4 h-4 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin"></div>
+          <>
+            <div className="w-5 h-5 border-2 border-[#011F5B]/30 border-t-[#011F5B] rounded-full animate-spin"></div>
+            Analyzing...
+          </>
         ) : (
           <>
             Analyze Fit
-            <span className="text-gray-600 group-hover:translate-x-1 transition-transform">→</span>
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
           </>
         )}
       </button>
@@ -388,7 +402,7 @@ function SkillAnalyzer({ opportunityId }: SkillAnalyzerProps) {
           {result.match_score}%
         </div>
         <div>
-          <p className="text-xs font-bold uppercase tracking-widest text-gray-700">Match Score</p>
+          <p className="text-sm font-bold uppercase tracking-widest text-gray-700">Match Score</p>
           <p className="text-sm font-medium text-gray-900">{result.match_score >= 80 ? 'High Compatibility' : 'Moderate Fit'}</p>
         </div>
       </div>
