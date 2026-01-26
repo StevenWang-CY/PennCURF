@@ -197,40 +197,120 @@ function OpportunityDetailContent({ params }: PageProps) {
 
             {opportunity.preferred_qualifications && cleanScrapedText(opportunity.preferred_qualifications) && (
               <section>
-                <h3 className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-8 flex items-center gap-3">
+                <h3 className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-8 flex items-center gap-3">
                   <span className="w-8 h-[1px] bg-gray-300"></span> Qualifications
                 </h3>
-                <div className="prose prose-lg font-sans text-gray-600 leading-[1.8] whitespace-pre-wrap">
+                <div className="prose prose-lg font-sans text-gray-700 leading-[1.8] whitespace-pre-wrap">
                   {cleanScrapedText(opportunity.preferred_qualifications)}
                 </div>
               </section>
             )}
+
+            {/* Skill Compatibility Section */}
+            <section className="pt-12 border-t border-gray-200">
+              <h3 className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-8 flex items-center gap-3">
+                <span className="w-8 h-[1px] bg-gray-300"></span> Fit Analysis
+              </h3>
+              <SkillAnalyzer opportunityId={id} />
+            </section>
+
+            {/* Email Generator Section */}
+            <section className="pt-12 border-t border-gray-200">
+              <h3 className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-8 flex items-center gap-3">
+                <span className="w-8 h-[1px] bg-gray-300"></span> Email Draft
+              </h3>
+
+              <div className="bg-gray-50 rounded-3xl p-8 border border-gray-200 relative overflow-hidden group">
+                <div className="relative z-10">
+                  <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+                    <div>
+                      <h4 className="font-serif text-2xl text-[#011F5B] mb-2">Ready to Apply?</h4>
+                      <p className="text-gray-600 font-sans">Draft a professional email to Dr. {opportunity.researcher_name?.split(' ').pop()} instantly.</p>
+                    </div>
+                    {!generatedEmail && !hasProfile && (
+                      <Link href="/profile" className="px-5 py-2.5 bg-white border border-gray-200 text-[#011F5B] font-bold rounded-lg hover:bg-blue-50 transition text-sm shadow-sm">
+                        Create Profile
+                      </Link>
+                    )}
+                  </div>
+
+                  {!generatedEmail ? (
+                    <button
+                      onClick={() => handleGenerateEmail(false)}
+                      disabled={generatingEmail || !hasProfile}
+                      className="w-full py-4 bg-[#011F5B] text-white rounded-xl font-bold text-lg hover:shadow-xl hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 shadow-lg shadow-blue-900/10"
+                    >
+                      {generatingEmail ? 'Drafting...' : 'Generate Email Draft'}
+                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                    </button>
+                  ) : (
+                    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4">
+                      {/* Email Preview */}
+                      <div className="space-y-4">
+                        <div className="border-b border-gray-200 pb-4">
+                          <p className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-1">Subject</p>
+                          <div className="flex justify-between items-center bg-white p-3 rounded-lg border border-gray-200">
+                            <p className="font-medium text-gray-900 truncate pr-2">{generatedEmail.subject}</p>
+                            <button onClick={() => copyToClipboard(generatedEmail.subject, 'subject')} className="text-xs text-[#011F5B] font-bold hover:underline shrink-0">
+                              {copied === 'subject' ? 'Copied' : 'Copy'}
+                            </button>
+                          </div>
+                        </div>
+                        <div>
+                          <p className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Body</p>
+                          <div className="relative">
+                            <textarea
+                              value={generatedEmail.body}
+                              onChange={e => setGeneratedEmail({ ...generatedEmail, body: e.target.value })}
+                              className="w-full min-h-[300px] bg-white border border-gray-200 rounded-xl p-6 font-mono text-sm text-gray-800 focus:ring-2 focus:ring-[#011F5B]/10 outline-none leading-relaxed resize-y shadow-sm"
+                            />
+                            <button onClick={() => copyToClipboard(generatedEmail.body, 'body')} className="absolute top-4 right-4 text-xs bg-gray-100 hover:bg-gray-200 px-3 py-1 rounded text-gray-600 font-medium transition">
+                              {copied === 'body' ? 'Copied' : 'Copy Body'}
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Controls */}
+                      <div className="flex flex-wrap gap-3 pt-2">
+                        <button onClick={() => copyToClipboard(`Subject: ${generatedEmail.subject}\n\n${generatedEmail.body}`, 'body')} className="flex-1 px-6 py-3 bg-[#011F5B] text-white font-bold rounded-lg hover:shadow-lg transition text-sm">
+                          Copy Full Email
+                        </button>
+                        <button onClick={() => handleGenerateEmail(false)} className="px-6 py-3 bg-white border border-gray-200 text-gray-700 font-bold rounded-lg hover:bg-gray-50 transition text-sm">
+                          Regenerate
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </section>
           </div>
 
           {/* Right Column: Metadata & Tools */}
-          <div className="lg:col-span-4 space-y-16">
+          <div className="lg:col-span-4 space-y-16 lg:sticky lg:top-24 h-fit">
             {/* Contact Info (Clean) */}
             <div className="space-y-6">
-              <h3 className="text-xs font-bold uppercase tracking-widest text-gray-400">Researcher Contact</h3>
+              <h3 className="text-xs font-bold uppercase tracking-widest text-gray-500">Researcher Contact</h3>
               <div className="space-y-2">
                 {opportunity.researcher_email ? (
                   <div className="group flex items-center gap-3">
                     <span className="font-mono text-sm text-[#011F5B] border-b border-gray-200 pb-0.5">{opportunity.researcher_email}</span>
-                    <button onClick={() => copyToClipboard(opportunity.researcher_email!, 'email')} className="opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-[#011F5B]">
+                    <button onClick={() => copyToClipboard(opportunity.researcher_email!, 'email')} className="opacity-0 group-hover:opacity-100 transition-opacity text-gray-500 hover:text-[#011F5B]">
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
                     </button>
                   </div>
-                ) : <span className="text-gray-400 italic">No email listed</span>}
+                ) : <span className="text-gray-500 italic">No email listed</span>}
 
                 <div className="flex flex-col gap-2 pt-4">
                   {isValidUrl(opportunity.researcher_profile_url) && (
                     <a href={opportunity.researcher_profile_url!} target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-gray-900 hover:text-[#011F5B] transition-colors flex items-center gap-2">
-                      CURF Profile <span className="text-gray-300">↗</span>
+                      CURF Profile <span className="text-gray-400">↗</span>
                     </a>
                   )}
                   {isValidUrl(opportunity.department_page_url) && (
                     <a href={opportunity.department_page_url!} target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-gray-900 hover:text-[#011F5B] transition-colors flex items-center gap-2">
-                      Department Page <span className="text-gray-300">↗</span>
+                      Department Page <span className="text-gray-400">↗</span>
                     </a>
                   )}
                 </div>
@@ -239,101 +319,22 @@ function OpportunityDetailContent({ params }: PageProps) {
 
             {/* Requirements Pills */}
             <div className="space-y-6">
-              <h3 className="text-xs font-bold uppercase tracking-widest text-gray-400">Target Students</h3>
+              <h3 className="text-xs font-bold uppercase tracking-widest text-gray-500">Target Students</h3>
               <div className="flex flex-wrap gap-2">
                 {opportunity.preferred_student_years?.map(y => (
-                  <span key={y} className="px-3 py-1 border border-gray-200 text-gray-600 text-[11px] font-bold uppercase tracking-widest rounded-full">
+                  <span key={y} className="px-3 py-1 border border-gray-200 text-gray-700 text-[11px] font-bold uppercase tracking-widest rounded-full">
                     {y}
                   </span>
                 ))}
                 {opportunity.academic_terms?.map(t => (
-                  <span key={t} className="px-3 py-1 border border-gray-200 text-gray-600 text-[11px] font-bold uppercase tracking-widest rounded-full">
+                  <span key={t} className="px-3 py-1 border border-gray-200 text-gray-700 text-[11px] font-bold uppercase tracking-widest rounded-full">
                     {t}
                   </span>
                 ))}
               </div>
             </div>
-
-            {/* Skill Analyzer (Clean Look) */}
-            <div className="pt-8 border-t border-gray-100">
-              <SkillAnalyzer opportunityId={id} />
-            </div>
           </div>
         </div>
-
-        {/* Action Section / Email Generator */}
-        <section className="mt-40 pt-20 border-t border-gray-100">
-          <div className="max-w-4xl mx-auto">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 mb-12">
-              <div>
-                <h2 className="font-serif text-4xl text-[#011F5B] mb-2">Interested?</h2>
-                <p className="text-gray-500 font-sans text-lg">Draft a professional email to the researcher in seconds.</p>
-              </div>
-              {!generatedEmail && !hasProfile && (
-                <Link href="/profile" className="px-6 py-3 bg-[#011F5B] text-white font-bold rounded-lg hover:bg-blue-900 transition shadow-lg">
-                  Create Profile to Draft
-                </Link>
-              )}
-            </div>
-
-            {/* Tool Interface */}
-            <div className="bg-gray-50 rounded-3xl p-8 md:p-12 border border-gray-100 relative overflow-hidden group">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-blue-100/50 rounded-full blur-3xl -mr-16 -mt-16 opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
-
-              <div className="relative z-10">
-                {/* Similar logic for email generation UI but styled strictly */}
-                {!generatedEmail ? (
-                  <button
-                    onClick={() => handleGenerateEmail(false)}
-                    disabled={generatingEmail || !hasProfile}
-                    className="w-full md:w-auto px-8 py-4 bg-[#011F5B] text-white rounded-xl font-bold text-lg hover:shadow-xl hover:-translate-y-1 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
-                  >
-                    {generatingEmail ? 'Drafting...' : 'Generate Email Draft'}
-                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
-                  </button>
-                ) : (
-                  <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4">
-                    {/* Email Preview */}
-                    <div className="space-y-4">
-                      <div className="border-b border-gray-200 pb-4">
-                        <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-1">Subject</p>
-                        <div className="flex justify-between items-center">
-                          <p className="font-medium text-gray-900">{generatedEmail.subject}</p>
-                          <button onClick={() => copyToClipboard(generatedEmail.subject, 'subject')} className="text-xs text-[#011F5B] font-bold hover:underline">
-                            {copied === 'subject' ? 'Copied' : 'Copy'}
-                          </button>
-                        </div>
-                      </div>
-                      <div>
-                        <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Body</p>
-                        <div className="relative">
-                          <textarea
-                            value={generatedEmail.body}
-                            onChange={e => setGeneratedEmail({ ...generatedEmail, body: e.target.value })}
-                            className="w-full min-h-[300px] bg-white border border-gray-200 rounded-xl p-6 font-mono text-sm text-gray-700 focus:ring-2 focus:ring-[#011F5B]/10 outline-none leading-relaxed resize-y shadow-sm"
-                          />
-                          <button onClick={() => copyToClipboard(generatedEmail.body, 'body')} className="absolute top-4 right-4 text-xs bg-gray-100 hover:bg-gray-200 px-3 py-1 rounded text-gray-600 font-medium transition">
-                            {copied === 'body' ? 'Copied' : 'Copy Body'}
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Controls */}
-                    <div className="flex flex-wrap gap-4 pt-4 border-t border-gray-200">
-                      <button onClick={() => copyToClipboard(`Subject: ${generatedEmail.subject}\n\n${generatedEmail.body}`, 'body')} className="px-6 py-3 bg-[#011F5B] text-white font-bold rounded-lg hover:shadow-lg transition">
-                        Copy Full Email
-                      </button>
-                      <button onClick={() => handleGenerateEmail(false)} className="px-6 py-3 bg-white border border-gray-200 text-gray-600 font-bold rounded-lg hover:bg-gray-50 transition">
-                        Regenerate
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </section>
       </div>
     </div>
   );
@@ -387,11 +388,11 @@ function SkillAnalyzer({ opportunityId }: SkillAnalyzerProps) {
           {result.match_score}%
         </div>
         <div>
-          <p className="text-xs font-bold uppercase tracking-widest text-gray-400">Match Score</p>
+          <p className="text-xs font-bold uppercase tracking-widest text-gray-500">Match Score</p>
           <p className="text-sm font-medium text-gray-900">{result.match_score >= 80 ? 'High Compatibility' : 'Moderate Fit'}</p>
         </div>
       </div>
-      <p className="text-sm text-gray-500 leading-relaxed mb-6 border-b border-gray-100 pb-4">{result.analysis_text}</p>
+      <p className="text-sm text-gray-600 leading-relaxed mb-6 border-b border-gray-100 pb-4">{result.analysis_text}</p>
 
       <div className="space-y-4">
         <div>

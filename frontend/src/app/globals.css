@@ -7,38 +7,36 @@
 
   --color-primary: var(--penn-blue);
   --color-primary-soft: rgba(1, 31, 91, 0.08);
-  /* Penn Blue at 8% opacity */
 
   --color-accent: var(--penn-red);
   --color-accent-soft: rgba(153, 0, 0, 0.08);
-  /* Penn Red at 8% opacity */
 
   --color-surface: #ffffff;
   --color-surface-hover: #fafafa;
   --color-surface-highlight: #f8fafc;
 
-  --color-text-secondary: #64748b;
-  /* Slate 500 */
-  --color-text-tertiary: #94a3b8;
-  /* Slate 400 */
+  --color-text-secondary: #475569;
+  /* Darkened from Slate 500 */
+  --color-text-tertiary: #64748b;
+  /* Darkened from Slate 400 */
 
-  --border-subtle: rgba(0, 0, 0, 0.05);
-  --border-focus: rgba(1, 31, 91, 0.15);
+  --border-subtle: rgba(0, 0, 0, 0.1);
+  --border-focus: rgba(1, 31, 91, 0.2);
+
+  --background: #ffffff;
+  --foreground: #171717;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  /* Fonts mapped from layout.tsx */
+  /* Fonts */
   --font-sans: var(--font-sans);
   --font-serif: var(--font-serif);
 
-  /* Extend spacing for "Delicate" breathing room */
   --spacing-18: 4.5rem;
   --spacing-24: 6rem;
-  /* Extreme whitespace */
 
-  /* Custom Shadows for 3D Lift */
   --shadow-layered:
     0 2px 4px -1px rgba(0, 0, 0, 0.06),
     0 4px 6px -1px rgba(0, 0, 0, 0.04),
@@ -73,39 +71,26 @@
   }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-sans), system-ui, sans-serif;
-  letter-spacing: -0.01em;
-  /* Slightly tighter body text for modern look */
+  font-family: Georgia, serif;
+  /* User Request: Georgia for non-titles */
+  letter-spacing: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Base Styles for "Impressive" Feel */
-/* Base Styles for "Impressive" Feel */
+/* Base Styles */
 h1,
-h2 {
-  font-family: var(--font-serif), serif;
-  /* Enforce Serif for Major Headers */
-  letter-spacing: -0.02em;
-}
-
+h2,
 h3,
 h4,
 h5,
 h6 {
-  font-family: var(--font-sans), sans-serif;
-  /* Keep UI headers clean */
-  letter-spacing: -0.01em;
+  font-family: var(--font-serif), serif;
+  /* Treating all headers as titles */
+  letter-spacing: -0.02em;
 }
 
 /* Utility for delicate borders */
