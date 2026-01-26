@@ -91,16 +91,21 @@ body {
 }
 
 /* Base Styles for "Impressive" Feel */
+/* Base Styles for "Impressive" Feel */
 h1,
-h2,
+h2 {
+  font-family: var(--font-serif), serif;
+  /* Enforce Serif for Major Headers */
+  letter-spacing: -0.02em;
+}
+
 h3,
 h4,
 h5,
 h6 {
-  font-family: var(--font-serif), serif;
-  /* Enforce Serif for Headers */
-  letter-spacing: -0.02em;
-  /* Tighter headings */
+  font-family: var(--font-sans), sans-serif;
+  /* Keep UI headers clean */
+  letter-spacing: -0.01em;
 }
 
 /* Utility for delicate borders */

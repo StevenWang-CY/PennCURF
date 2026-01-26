@@ -130,7 +130,7 @@ function OpportunityDetailContent({ params }: PageProps) {
   return (
     <div className="relative min-h-screen bg-white text-[#1e293b]">
       {/* Background */}
-      <div className="fixed inset-0 overflow-hidden z-0 pointer-events-none opacity-20">
+      <div className="fixed inset-0 overflow-hidden z-0 pointer-events-none opacity-40">
         <div className="absolute top-[-10%] right-[-5%] w-[800px] h-[800px] bg-blue-50/50 rounded-full mix-blend-multiply filter blur-[120px] animate-blob"></div>
       </div>
 
@@ -158,13 +158,13 @@ function OpportunityDetailContent({ params }: PageProps) {
             ))}
           </div>
 
-          <h1 className="font-serif text-5xl md:text-7xl lg:text-8xl leading-[0.95] md:leading-[0.9] tracking-tight text-[#011F5B] mb-12">
+          <h1 className="font-serif text-4xl md:text-6xl lg:text-7xl leading-[0.95] md:leading-[0.9] tracking-tight text-[#011F5B] mb-12">
             {opportunity.title}
           </h1>
 
-          <div className="flex items-center gap-4 text-lg md:text-xl font-sans text-gray-500">
+          <div className="flex items-center gap-4 text-lg md:text-xl font-sans text-gray-600">
             {opportunity.researcher_name && <span className="text-gray-900 font-medium border-b border-gray-300 pb-0.5">{opportunity.researcher_name}</span>}
-            {opportunity.researcher_title && <span className="italic font-serif">{opportunity.researcher_title}</span>}
+            {opportunity.researcher_title && <span className="text-gray-500">{opportunity.researcher_title}</span>}
           </div>
         </header>
 

@@ -128,58 +128,157 @@ function SearchContent() {
             </p>
           </div>
 
-          {/* Google Flights Style Search Input */}
-          <div className="w-full max-w-2xl relative z-50">
-            <div className="relative group">
-              <div className={`
-                absolute inset-0 bg-gradient-to-r from-blue-100/20 to-red-100/20 rounded-2xl blur-xl opacity-0 transition-opacity duration-500
-                ${searching || query ? 'opacity-100' : 'group-hover:opacity-50'}
-              `}></div>
+          {/* Search Mode Toggle */}
+          <div className="flex p-1 bg-gray-100/50 backdrop-blur-sm rounded-full mb-8 relative z-50 w-fit mx-auto border border-gray-200/50">
+            <button
+              onClick={() => { setSearchMode('natural'); setQuery(''); }}
+              className={`px-6 py-2 rounded-full text-sm font-bold transition-all duration-300 ${searchMode === 'natural'
+                ? 'bg-white text-[#011F5B] shadow-sm ring-1 ring-black/5'
+                : 'text-gray-400 hover:text-gray-600'
+                }`}
+            >
+              AI Search
+            </button>
+            <button
+              onClick={() => { setSearchMode('filter'); setQuery(''); }}
+              className={`px-6 py-2 rounded-full text-sm font-bold transition-all duration-300 ${searchMode === 'filter'
+                ? 'bg-white text-[#011F5B] shadow-sm ring-1 ring-black/5'
+                : 'text-gray-400 hover:text-gray-600'
+                }`}
+            >
+              Filters
+            </button>
+          </div>
 
-              <div className="relative bg-white/60 backdrop-blur-2xl rounded-2xl shadow-2xl border border-white/50 overflow-hidden transition-all duration-300 focus-within:ring-4 focus-within:ring-[#011F5B]/5 focus-within:scale-[1.01]">
-                <div className="flex items-center h-20 px-8">
-                  <svg className={`w-6 h-6 text-gray-400 transition-colors ${searching ? 'animate-spin text-[#011F5B]' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    {searching
-                      ? <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                      : <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    }
-                  </svg>
-                  <input
-                    type="text"
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleNaturalSearch()}
-                    placeholder="Search by topic, professor, or keyword..."
-                    className="w-full h-full bg-transparent border-none focus:ring-0 px-6 text-xl placeholder:text-gray-300 text-[#011F5B] font-serif"
-                  />
-                  {query && (
-                    <button onClick={() => setQuery('')} className="p-2 text-gray-300 hover:text-gray-500 transition-colors">
-                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-                    </button>
-                  )}
+          {/* Search Interface Container */}
+          <div className="w-full max-w-4xl relative z-50">
+
+            {/* AI Search Mode */}
+            {searchMode === 'natural' && (
+              <div className="relative group max-w-2xl mx-auto">
+                <div className={`
+                        absolute inset-0 bg-gradient-to-r from-blue-100/20 to-red-100/20 rounded-2xl blur-xl opacity-0 transition-opacity duration-500
+                        ${searching || query ? 'opacity-100' : 'group-hover:opacity-50'}
+                    `}></div>
+
+                <div className="relative bg-white/80 backdrop-blur-2xl rounded-2xl shadow-2xl border border-white/50 overflow-hidden transition-all duration-300 focus-within:ring-4 focus-within:ring-[#011F5B]/5 focus-within:scale-[1.01]">
+                  <div className="flex items-center h-20 px-8">
+                    <svg className={`w-6 h-6 text-gray-400 transition-colors ${searching ? 'animate-spin text-[#011F5B]' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      {searching
+                        ? <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        : <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                      }
+                    </svg>
+                    <input
+                      type="text"
+                      value={query}
+                      onChange={(e) => setQuery(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Enter' && handleNaturalSearch()}
+                      placeholder="Describe your ideal research opportunity..."
+                      className="w-full h-full bg-transparent border-none focus:ring-0 px-6 text-lg placeholder:text-gray-400 text-[#011F5B] font-sans font-medium"
+                    />
+                    {query && (
+                      <button onClick={() => setQuery('')} className="p-2 text-gray-300 hover:text-gray-500 transition-colors">
+                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                      </button>
+                    )}
+                  </div>
                 </div>
-
-                {/* Mode Toggle inside the search pill or attached? sticking to simple for now as requested */}
               </div>
-            </div>
+            )}
 
-            {/* Quick Filters */}
-            <div className="flex justify-center gap-4 mt-6">
-              {['Biomedical', 'Engineering', 'Social Science', 'Humanities'].map(cat => (
-                <button
-                  key={cat}
-                  onClick={() => {
-                    if (!activeFilters.research_categories?.includes(cat)) {
-                      setActiveFilters({ ...activeFilters, research_categories: [...(activeFilters.research_categories || []), cat] });
-                      handleFilterSearch(); // Trigger simplistic filter search
-                    }
-                  }}
-                  className="text-xs font-semibold uppercase tracking-widest text-gray-400 hover:text-[#011F5B] transition-colors"
-                >
-                  {cat}
-                </button>
-              ))}
-            </div>
+            {/* Filter Mode */}
+            {searchMode === 'filter' && (
+              <div className="bg-white/80 backdrop-blur-xl rounded-[2.5rem] shadow-layered border border-white/60 p-10 ring-1 ring-black/[0.03] animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <div className="space-y-10">
+                  {/* Categories */}
+                  <div>
+                    <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-4 ml-1">Research Category</label>
+                    <div className="flex flex-wrap gap-2">
+                      {filterOptions.research_categories.map(cat => (
+                        <button
+                          key={cat}
+                          onClick={() => {
+                            const current = activeFilters.research_categories || [];
+                            const updated = current.includes(cat) ? current.filter(c => c !== cat) : [...current, cat];
+                            setActiveFilters({ ...activeFilters, research_categories: updated });
+                          }}
+                          className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 border ${activeFilters.research_categories?.includes(cat)
+                              ? 'bg-[#011F5B] text-white border-[#011F5B] shadow-md transform scale-105'
+                              : 'bg-white text-gray-500 border-gray-100 hover:border-blue-100 hover:bg-blue-50/50 hover:text-[#011F5B]'
+                            }`}
+                        >
+                          {cat}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                    {/* Years */}
+                    <div>
+                      <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-4 ml-1">Student Year</label>
+                      <div className="flex flex-wrap gap-2">
+                        {filterOptions.preferred_student_years.map(year => (
+                          <button
+                            key={year}
+                            onClick={() => {
+                              const current = activeFilters.preferred_student_years || [];
+                              const updated = current.includes(year) ? current.filter(y => y !== year) : [...current, year];
+                              setActiveFilters({ ...activeFilters, preferred_student_years: updated });
+                            }}
+                            className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 border ${activeFilters.preferred_student_years?.includes(year)
+                                ? 'bg-[#990000] text-white border-[#990000] shadow-md transform scale-105'
+                                : 'bg-white text-gray-500 border-gray-100 hover:border-red-100 hover:bg-red-50/50 hover:text-[#990000]'
+                              }`}
+                          >
+                            {year}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Compensation */}
+                    <div>
+                      <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-4 ml-1">Compensation</label>
+                      <div className="flex flex-wrap gap-2">
+                        {[
+                          { key: 'is_paid', label: 'Paid' },
+                          { key: 'is_volunteer', label: 'Volunteer' },
+                          { key: 'is_work_study', label: 'Work Study' }
+                        ].map(type => {
+                          const isSelected = activeFilters[type.key as keyof FilterState] === true;
+                          return (
+                            <button
+                              key={type.key}
+                              onClick={() => setActiveFilters({ ...activeFilters, [type.key]: !isSelected })}
+                              className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 border flex items-center gap-2 ${isSelected
+                                  ? 'bg-emerald-600 text-white border-emerald-600 shadow-md transform scale-105'
+                                  : 'bg-white text-gray-500 border-gray-100 hover:border-emerald-100 hover:bg-emerald-50/50 hover:text-emerald-700'
+                                }`}
+                            >
+                              {isSelected && <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
+                              {type.label}
+                            </button>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="pt-6 flex items-center justify-between border-t border-gray-100">
+                    <button onClick={() => setActiveFilters({})} className="text-sm text-gray-400 hover:text-gray-600 font-medium transition-colors">Clear All</button>
+                    <button
+                      onClick={handleFilterSearch}
+                      className="px-8 py-3 bg-[#011F5B] text-white rounded-xl font-bold shadow-lg shadow-blue-900/10 hover:bg-[#003366] hover:shadow-xl hover:scale-105 transition-all duration-300"
+                    >
+                      Apply Filters
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
           </div>
         </div>
 
