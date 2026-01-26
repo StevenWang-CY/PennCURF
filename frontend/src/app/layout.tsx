@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Playfair_Display, Inter_Tight } from "next/font/google"; // High-end typography
 import "./globals.css";
 import { ProfileProvider } from "@/contexts/ProfileContext";
 import { AuthProvider } from "@/contexts/AuthContext";
@@ -7,7 +7,19 @@ import { BackendStatusProvider } from "@/contexts/BackendStatusContext";
 import NavBar from "@/components/NavBar";
 import BackendWakeUp from "@/components/BackendWakeUp";
 
-const inter = Inter({ subsets: ["latin"] });
+// "Massive Serif" for headlines
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  variable: "--font-serif",
+  display: "swap",
+});
+
+// "High Legibility" Sans for body
+const interTight = Inter_Tight({
+  subsets: ["latin"],
+  variable: "--font-sans",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "Penn CURF Research Finder",
@@ -21,7 +33,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.className} antialiased bg-[var(--background)] min-h-screen flex flex-col`}>
+      <body className={`${playfair.variable} ${interTight.variable} font-sans antialiased bg-[var(--background)] min-h-screen flex flex-col`}>
         <BackendStatusProvider>
           <BackendWakeUp />
           <AuthProvider>

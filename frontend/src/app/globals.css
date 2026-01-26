@@ -29,11 +29,14 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* Fonts mapped from layout.tsx */
+  --font-sans: var(--font-sans);
+  --font-serif: var(--font-serif);
 
   /* Extend spacing for "Delicate" breathing room */
   --spacing-18: 4.5rem;
+  --spacing-24: 6rem;
+  /* Extreme whitespace */
 
   /* Custom Shadows for 3D Lift */
   --shadow-layered:
@@ -47,6 +50,7 @@
     0 25px 50px -12px rgba(0, 0, 0, 0.08);
 
   --backdrop-blur-xs: 2px;
+  --backdrop-blur-xl: 20px;
 
   --animate-blob: blob 7s infinite;
 }
@@ -93,6 +97,8 @@ h3,
 h4,
 h5,
 h6 {
+  font-family: var(--font-serif), serif;
+  /* Enforce Serif for Headers */
   letter-spacing: -0.02em;
   /* Tighter headings */
 }
