@@ -137,7 +137,7 @@ function OpportunityDetailContent({ params }: PageProps) {
       <div className="relative z-10 max-w-5xl mx-auto px-6 py-20 md:py-32">
         {/* Navigation */}
         <div className="mb-24">
-          <Link href="/search" className="group flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-gray-600 hover:text-[#011F5B] transition-colors">
+          <Link href="/search" className="group flex items-center gap-2 text-sm font-bold uppercase tracking-widest font-sans text-gray-600 hover:text-[#011F5B] transition-colors">
             <svg className="w-4 h-4 transform group-hover:-translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
             Research Directory
           </Link>
@@ -147,12 +147,12 @@ function OpportunityDetailContent({ params }: PageProps) {
         <header className="mb-32 max-w-4xl">
           <div className="flex flex-wrap gap-3 mb-8">
             {opportunity.is_paid && (
-              <span className="px-3 py-1 border border-gray-200 text-[#011F5B] text-[10px] font-bold uppercase tracking-widest rounded-full bg-transparent">
+              <span className="px-3 py-1 border border-gray-200 text-[#011F5B] text-xs font-bold uppercase tracking-widest font-sans rounded-full bg-transparent">
                 Paid Position
               </span>
             )}
             {opportunity.research_categories?.map(cat => (
-              <span key={cat} className="px-3 py-1 border border-gray-200 text-gray-700 text-[10px] font-bold uppercase tracking-widest rounded-full bg-transparent">
+              <span key={cat} className="px-3 py-1 border border-gray-200 text-gray-700 text-xs font-bold uppercase tracking-widest font-sans rounded-full bg-transparent">
                 {cat}
               </span>
             ))}
@@ -175,7 +175,7 @@ function OpportunityDetailContent({ params }: PageProps) {
           <div className="lg:col-span-8 space-y-24">
             {opportunity.description && (
               <section>
-                <h3 className="text-sm font-bold uppercase tracking-widest text-gray-600 mb-8 flex items-center gap-3">
+                <h3 className="text-sm font-bold uppercase tracking-widest font-sans text-gray-600 mb-8 flex items-center gap-3">
                   <span className="w-8 h-[1px] bg-gray-300"></span> Project Overview
                 </h3>
                 <div className="prose prose-lg md:prose-xl  text-gray-800 leading-[1.8] max-w-none">
@@ -186,7 +186,7 @@ function OpportunityDetailContent({ params }: PageProps) {
 
             {opportunity.mentor_areas && (
               <section>
-                <h3 className="text-sm font-bold uppercase tracking-widest text-gray-600 mb-8 flex items-center gap-3">
+                <h3 className="text-sm font-bold uppercase tracking-widest font-sans text-gray-600 mb-8 flex items-center gap-3">
                   <span className="w-8 h-[1px] bg-gray-300"></span> Research Areas
                 </h3>
                 <div className="prose prose-lg  text-gray-800 leading-[1.8]">
@@ -197,7 +197,7 @@ function OpportunityDetailContent({ params }: PageProps) {
 
             {opportunity.preferred_qualifications && cleanScrapedText(opportunity.preferred_qualifications) && (
               <section>
-                <h3 className="text-sm font-bold uppercase tracking-widest text-gray-700 mb-8 flex items-center gap-3">
+                <h3 className="text-sm font-bold uppercase tracking-widest font-sans text-gray-700 mb-8 flex items-center gap-3">
                   <span className="w-8 h-[1px] bg-gray-300"></span> Qualifications
                 </h3>
                 <div className="prose prose-lg  text-gray-700 leading-[1.8] whitespace-pre-wrap">
@@ -208,7 +208,7 @@ function OpportunityDetailContent({ params }: PageProps) {
 
             {/* Skill Compatibility Section */}
             <section className="pt-12 border-t border-gray-200">
-              <h3 className="text-sm font-bold uppercase tracking-widest text-gray-700 mb-8 flex items-center gap-3">
+              <h3 className="text-sm font-bold uppercase tracking-widest font-sans text-gray-700 mb-8 flex items-center gap-3">
                 <span className="w-8 h-[1px] bg-gray-300"></span> Fit Analysis
               </h3>
 
@@ -217,7 +217,7 @@ function OpportunityDetailContent({ params }: PageProps) {
                   <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
                     <div>
                       <h4 className="font-serif text-2xl text-[#011F5B] mb-2">Am I a good fit?</h4>
-                      <p className="text-gray-800 font-sans">Instantly analyze your compatibility based on your profile.</p>
+                      <p className="text-gray-800">Instantly analyze your compatibility based on your profile.</p>
                     </div>
                   </div>
                   <SkillAnalyzer opportunityId={id} />
@@ -227,7 +227,7 @@ function OpportunityDetailContent({ params }: PageProps) {
 
             {/* Email Generator Section */}
             <section className="pt-12 border-t border-gray-200">
-              <h3 className="text-sm font-bold uppercase tracking-widest text-gray-700 mb-8 flex items-center gap-3">
+              <h3 className="text-sm font-bold uppercase tracking-widest font-sans text-gray-700 mb-8 flex items-center gap-3">
                 <span className="w-8 h-[1px] bg-gray-300"></span> Email Draft
               </h3>
 
@@ -259,7 +259,7 @@ function OpportunityDetailContent({ params }: PageProps) {
                       {/* Email Preview */}
                       <div className="space-y-4">
                         <div className="border-b border-gray-200 pb-4">
-                          <p className="text-sm font-bold uppercase tracking-widest text-gray-700 mb-1">Subject</p>
+                          <p className="text-sm font-bold uppercase tracking-widest font-sans text-gray-700 mb-1">Subject</p>
                           <div className="flex justify-between items-center bg-white p-3 rounded-lg border border-gray-200">
                             <p className="font-medium text-gray-900 truncate pr-2">{generatedEmail.subject}</p>
                             <button onClick={() => copyToClipboard(generatedEmail.subject, 'subject')} className="text-xs text-[#011F5B] font-bold hover:underline shrink-0">
@@ -268,7 +268,7 @@ function OpportunityDetailContent({ params }: PageProps) {
                           </div>
                         </div>
                         <div>
-                          <p className="text-sm font-bold uppercase tracking-widest text-gray-700 mb-2">Body</p>
+                          <p className="text-sm font-bold uppercase tracking-widest font-sans text-gray-700 mb-2">Body</p>
                           <div className="relative">
                             <textarea
                               value={generatedEmail.body}
@@ -302,7 +302,7 @@ function OpportunityDetailContent({ params }: PageProps) {
           <div className="lg:col-span-4 space-y-16 lg:sticky lg:top-24 h-fit">
             {/* Contact Info (Clean) */}
             <div className="space-y-6">
-              <h3 className="text-sm font-bold uppercase tracking-widest text-gray-700">Researcher Contact</h3>
+              <h3 className="text-sm font-bold uppercase tracking-widest font-sans text-gray-700">Researcher Contact</h3>
               <div className="space-y-2">
                 {opportunity.researcher_email ? (
                   <div className="group flex items-center gap-3">
@@ -330,15 +330,15 @@ function OpportunityDetailContent({ params }: PageProps) {
 
             {/* Requirements Pills */}
             <div className="space-y-6">
-              <h3 className="text-sm font-bold uppercase tracking-widest text-gray-700">Target Students</h3>
+              <h3 className="text-sm font-bold uppercase tracking-widest font-sans text-gray-700">Target Students</h3>
               <div className="flex flex-wrap gap-2">
                 {opportunity.preferred_student_years?.map(y => (
-                  <span key={y} className="px-3 py-1 border border-gray-200 text-gray-700 text-[11px] font-bold uppercase tracking-widest rounded-full">
+                  <span key={y} className="px-3 py-1 border border-gray-200 text-gray-700 text-xs font-bold uppercase tracking-widest font-sans rounded-full">
                     {y}
                   </span>
                 ))}
                 {opportunity.academic_terms?.map(t => (
-                  <span key={t} className="px-3 py-1 border border-gray-200 text-gray-700 text-[11px] font-bold uppercase tracking-widest rounded-full">
+                  <span key={t} className="px-3 py-1 border border-gray-200 text-gray-700 text-xs font-bold uppercase tracking-widest font-sans rounded-full">
                     {t}
                   </span>
                 ))}
@@ -402,7 +402,7 @@ function SkillAnalyzer({ opportunityId }: SkillAnalyzerProps) {
           {result.match_score}%
         </div>
         <div>
-          <p className="text-sm font-bold uppercase tracking-widest text-gray-700">Match Score</p>
+          <p className="text-sm font-bold uppercase tracking-widest font-sans text-gray-700">Match Score</p>
           <p className="text-sm font-medium text-gray-900">{result.match_score >= 80 ? 'High Compatibility' : 'Moderate Fit'}</p>
         </div>
       </div>
@@ -410,10 +410,10 @@ function SkillAnalyzer({ opportunityId }: SkillAnalyzerProps) {
 
       <div className="space-y-4">
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-widest text-[#011F5B] mb-2">Matched Skills</p>
+          <p className="text-xs font-bold uppercase tracking-widest font-sans text-[#011F5B] mb-2">Matched Skills</p>
           <div className="flex flex-wrap gap-1">
             {result.matched_skills.map(skill => (
-              <span key={skill} className="px-2 py-0.5 bg-blue-50 text-blue-800 text-[10px] font-bold uppercase tracking-wide rounded border border-blue-100">
+              <span key={skill} className="px-2 py-0.5 bg-blue-50 text-blue-800 text-xs font-bold uppercase tracking-wide rounded border border-blue-100">
                 {skill}
               </span>
             ))}
