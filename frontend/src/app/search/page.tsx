@@ -123,7 +123,7 @@ function SearchContent() {
             <h1 className="text-5xl md:text-7xl font-serif text-[#011F5B] tracking-tight">
               Research Directory
             </h1>
-            <p className="text-gray-400 font-sans text-lg tracking-wide uppercase text-[0.7rem] font-bold">
+            <p className="text-gray-600  text-lg tracking-wide uppercase text-[0.7rem] font-bold">
               {displayedOpportunities.length} Available Positions
             </p>
           </div>
@@ -134,7 +134,7 @@ function SearchContent() {
               onClick={() => { setSearchMode('natural'); setQuery(''); }}
               className={`px-6 py-2 rounded-full text-sm font-bold transition-all duration-300 ${searchMode === 'natural'
                 ? 'bg-white text-[#011F5B] shadow-sm ring-1 ring-black/5'
-                : 'text-gray-400 hover:text-gray-600'
+                : 'text-gray-600 hover:text-gray-800'
                 }`}
             >
               AI Search
@@ -143,7 +143,7 @@ function SearchContent() {
               onClick={() => { setSearchMode('filter'); setQuery(''); }}
               className={`px-6 py-2 rounded-full text-sm font-bold transition-all duration-300 ${searchMode === 'filter'
                 ? 'bg-white text-[#011F5B] shadow-sm ring-1 ring-black/5'
-                : 'text-gray-400 hover:text-gray-600'
+                : 'text-gray-600 hover:text-gray-800'
                 }`}
             >
               Filters
@@ -163,7 +163,7 @@ function SearchContent() {
 
                 <div className="relative bg-white/80 backdrop-blur-2xl rounded-2xl shadow-2xl border border-white/50 overflow-hidden transition-all duration-300 focus-within:ring-4 focus-within:ring-[#011F5B]/5 focus-within:scale-[1.01]">
                   <div className="flex items-center h-20 px-8">
-                    <svg className={`w-6 h-6 text-gray-400 transition-colors ${searching ? 'animate-spin text-[#011F5B]' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className={`w-6 h-6 text-gray-600 transition-colors ${searching ? 'animate-spin text-[#011F5B]' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       {searching
                         ? <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                         : <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -175,10 +175,10 @@ function SearchContent() {
                       onChange={(e) => setQuery(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && handleNaturalSearch()}
                       placeholder="Describe your ideal research opportunity..."
-                      className="w-full h-full bg-transparent border-none focus:ring-0 px-6 text-lg placeholder:text-gray-400 text-[#011F5B] font-sans font-medium"
+                      className="w-full h-full bg-transparent border-none focus:ring-0 px-6 text-lg placeholder:text-gray-600 text-[#011F5B]  font-medium"
                     />
                     {query && (
-                      <button onClick={() => setQuery('')} className="p-2 text-gray-300 hover:text-gray-500 transition-colors">
+                      <button onClick={() => setQuery('')} className="p-2 text-gray-300 hover:text-gray-700 transition-colors">
                         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                       </button>
                     )}
@@ -193,7 +193,7 @@ function SearchContent() {
                 <div className="space-y-10">
                   {/* Categories */}
                   <div>
-                    <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-4 ml-1">Research Category</label>
+                    <label className="block text-xs font-bold text-gray-600 uppercase tracking-widest mb-4 ml-1">Research Category</label>
                     <div className="flex flex-wrap gap-2">
                       {filterOptions.research_categories.map(cat => (
                         <button
@@ -204,8 +204,8 @@ function SearchContent() {
                             setActiveFilters({ ...activeFilters, research_categories: updated });
                           }}
                           className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 border ${activeFilters.research_categories?.includes(cat)
-                              ? 'bg-[#011F5B] text-white border-[#011F5B] shadow-md transform scale-105'
-                              : 'bg-white text-gray-500 border-gray-100 hover:border-blue-100 hover:bg-blue-50/50 hover:text-[#011F5B]'
+                            ? 'bg-[#011F5B] text-white border-[#011F5B] shadow-md transform scale-105'
+                            : 'bg-white text-gray-700 border-gray-100 hover:border-blue-100 hover:bg-blue-50/50 hover:text-[#011F5B]'
                             }`}
                         >
                           {cat}
@@ -217,7 +217,7 @@ function SearchContent() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                     {/* Years */}
                     <div>
-                      <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-4 ml-1">Student Year</label>
+                      <label className="block text-xs font-bold text-gray-600 uppercase tracking-widest mb-4 ml-1">Student Year</label>
                       <div className="flex flex-wrap gap-2">
                         {filterOptions.preferred_student_years.map(year => (
                           <button
@@ -228,8 +228,8 @@ function SearchContent() {
                               setActiveFilters({ ...activeFilters, preferred_student_years: updated });
                             }}
                             className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 border ${activeFilters.preferred_student_years?.includes(year)
-                                ? 'bg-[#990000] text-white border-[#990000] shadow-md transform scale-105'
-                                : 'bg-white text-gray-500 border-gray-100 hover:border-red-100 hover:bg-red-50/50 hover:text-[#990000]'
+                              ? 'bg-[#990000] text-white border-[#990000] shadow-md transform scale-105'
+                              : 'bg-white text-gray-700 border-gray-100 hover:border-red-100 hover:bg-red-50/50 hover:text-[#990000]'
                               }`}
                           >
                             {year}
@@ -240,7 +240,7 @@ function SearchContent() {
 
                     {/* Compensation */}
                     <div>
-                      <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-4 ml-1">Compensation</label>
+                      <label className="block text-xs font-bold text-gray-600 uppercase tracking-widest mb-4 ml-1">Compensation</label>
                       <div className="flex flex-wrap gap-2">
                         {[
                           { key: 'is_paid', label: 'Paid' },
@@ -253,8 +253,8 @@ function SearchContent() {
                               key={type.key}
                               onClick={() => setActiveFilters({ ...activeFilters, [type.key]: !isSelected })}
                               className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 border flex items-center gap-2 ${isSelected
-                                  ? 'bg-emerald-600 text-white border-emerald-600 shadow-md transform scale-105'
-                                  : 'bg-white text-gray-500 border-gray-100 hover:border-emerald-100 hover:bg-emerald-50/50 hover:text-emerald-700'
+                                ? 'bg-emerald-600 text-white border-emerald-600 shadow-md transform scale-105'
+                                : 'bg-white text-gray-700 border-gray-100 hover:border-emerald-100 hover:bg-emerald-50/50 hover:text-emerald-700'
                                 }`}
                             >
                               {isSelected && <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
@@ -267,7 +267,7 @@ function SearchContent() {
                   </div>
 
                   <div className="pt-6 flex items-center justify-between border-t border-gray-100">
-                    <button onClick={() => setActiveFilters({})} className="text-sm text-gray-400 hover:text-gray-600 font-medium transition-colors">Clear All</button>
+                    <button onClick={() => setActiveFilters({})} className="text-sm text-gray-600 hover:text-gray-800 font-medium transition-colors">Clear All</button>
                     <button
                       onClick={handleFilterSearch}
                       className="px-8 py-3 bg-[#011F5B] text-white rounded-xl font-bold shadow-lg shadow-blue-900/10 hover:bg-[#003366] hover:shadow-xl hover:scale-105 transition-all duration-300"
@@ -287,7 +287,7 @@ function SearchContent() {
           {!query && !searching ? (
             /* Initial State: Featured Grid */
             <div className="space-y-8">
-              <h3 className="text-sm font-bold uppercase tracking-widest text-gray-400 border-b border-gray-100 pb-4">
+              <h3 className="text-sm font-bold uppercase tracking-widest text-gray-600 border-b border-gray-100 pb-4">
                 Featured Research
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -306,7 +306,7 @@ function SearchContent() {
                 </div>
               ) : displayedOpportunities.length === 0 ? (
                 <div className="py-20 text-center">
-                  <p className="text-2xl font-serif text-gray-400 italic mb-4">No exact matches found.</p>
+                  <p className="text-2xl font-serif text-gray-600 italic mb-4">No exact matches found.</p>
                   <button onClick={() => setQuery('')} className="text-[#011F5B] font-bold border-b-2 border-[#011F5B]/20 hover:border-[#011F5B] transition-colors">
                     View all opportunities
                   </button>
@@ -348,14 +348,14 @@ function FeaturedCard({ opportunity }: { opportunity: ResearchOpportunity }) {
             {opportunity.is_paid && (
               <span className="w-2 h-2 rounded-full bg-green-500"></span>
             )}
-            <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-gray-600">
               {opportunity.research_categories?.[0] || "Research"}
             </span>
           </div>
           <h3 className="text-xl font-serif text-[#011F5B] mb-3 leading-tight group-hover:underline decoration-1 underline-offset-4 decoration-gray-300">
             {opportunity.title}
           </h3>
-          <p className="text-sm text-gray-500 line-clamp-3 leading-relaxed mb-6">
+          <p className="text-sm text-gray-700 line-clamp-3 leading-relaxed mb-6">
             {opportunity.teaser || opportunity.description}
           </p>
         </div>
@@ -363,7 +363,7 @@ function FeaturedCard({ opportunity }: { opportunity: ResearchOpportunity }) {
           <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-[#011F5B] font-serif font-bold text-xs">
             {opportunity.researcher_name?.[0] || "P"}
           </div>
-          <span className="text-xs font-bold text-gray-400 uppercase tracking-wider truncate">
+          <span className="text-xs font-bold text-gray-600 uppercase tracking-wider truncate">
             {opportunity.researcher_name}
           </span>
         </div>
@@ -394,25 +394,25 @@ function OpportunityItem({ opportunity, index, score, explanation }: { opportuni
             </h2>
             {score && (
               <span className="px-2 py-1 bg-green-50 text-green-700 text-[10px] font-bold uppercase tracking-wider rounded border border-green-100/50 opacity-60 group-hover:opacity-100 transition-opacity">
-                {score}%
+                {Math.round(score / 10)}/10
               </span>
             )}
           </div>
 
           {/* Researcher */}
-          <div className="mb-6 flex items-center gap-3 text-xs text-gray-500 font-bold uppercase tracking-widest">
-            {opportunity.researcher_name && <span className="text-gray-400">{opportunity.researcher_name}</span>}
+          <div className="mb-6 flex items-center gap-3 text-xs text-gray-700 font-bold uppercase tracking-widest">
+            {opportunity.researcher_name && <span className="text-gray-600">{opportunity.researcher_name}</span>}
           </div>
 
           {/* "Teaser" description */}
-          <p className="text-gray-500 font-sans text-base leading-[1.8] line-clamp-2 mb-6 group-hover:text-gray-600 transition-colors max-w-2xl">
+          <p className="text-gray-700  text-base leading-[1.8] line-clamp-2 mb-6 group-hover:text-gray-800 transition-colors max-w-2xl">
             {explanation ? `"${explanation}"` : (opportunity.teaser || opportunity.description?.substring(0, 300) + '...')}
           </p>
 
           {/* Metadata Pills */}
           <div className="flex flex-wrap gap-2 opacity-60 group-hover:opacity-100 transition-opacity duration-500">
             {opportunity.research_categories?.slice(0, 3).map(cat => (
-              <span key={cat} className="px-3 py-1 border border-gray-200 text-gray-400 text-[10px] font-bold uppercase tracking-widest rounded-full bg-transparent">
+              <span key={cat} className="px-3 py-1 border border-gray-200 text-gray-600 text-[10px] font-bold uppercase tracking-widest rounded-full bg-transparent">
                 {cat}
               </span>
             ))}

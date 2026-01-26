@@ -137,7 +137,7 @@ function OpportunityDetailContent({ params }: PageProps) {
       <div className="relative z-10 max-w-5xl mx-auto px-6 py-20 md:py-32">
         {/* Navigation */}
         <div className="mb-24">
-          <Link href="/search" className="group flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-gray-400 hover:text-[#011F5B] transition-colors">
+          <Link href="/search" className="group flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-gray-600 hover:text-[#011F5B] transition-colors">
             <svg className="w-4 h-4 transform group-hover:-translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
             Research Directory
           </Link>
@@ -152,7 +152,7 @@ function OpportunityDetailContent({ params }: PageProps) {
               </span>
             )}
             {opportunity.research_categories?.map(cat => (
-              <span key={cat} className="px-3 py-1 border border-gray-200 text-gray-500 text-[10px] font-bold uppercase tracking-widest rounded-full bg-transparent">
+              <span key={cat} className="px-3 py-1 border border-gray-200 text-gray-700 text-[10px] font-bold uppercase tracking-widest rounded-full bg-transparent">
                 {cat}
               </span>
             ))}
@@ -162,9 +162,9 @@ function OpportunityDetailContent({ params }: PageProps) {
             {opportunity.title}
           </h1>
 
-          <div className="flex items-center gap-4 text-lg md:text-xl font-sans text-gray-600">
+          <div className="flex items-center gap-4 text-lg md:text-xl  text-gray-800">
             {opportunity.researcher_name && <span className="text-gray-900 font-medium border-b border-gray-300 pb-0.5">{opportunity.researcher_name}</span>}
-            {opportunity.researcher_title && <span className="text-gray-500">{opportunity.researcher_title}</span>}
+            {opportunity.researcher_title && <span className="text-gray-700">{opportunity.researcher_title}</span>}
           </div>
         </header>
 
@@ -175,10 +175,10 @@ function OpportunityDetailContent({ params }: PageProps) {
           <div className="lg:col-span-8 space-y-24">
             {opportunity.description && (
               <section>
-                <h3 className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-8 flex items-center gap-3">
+                <h3 className="text-xs font-bold uppercase tracking-widest text-gray-600 mb-8 flex items-center gap-3">
                   <span className="w-8 h-[1px] bg-gray-300"></span> Project Overview
                 </h3>
-                <div className="prose prose-lg md:prose-xl font-sans text-gray-600 leading-[1.8] max-w-none">
+                <div className="prose prose-lg md:prose-xl  text-gray-800 leading-[1.8] max-w-none">
                   <p className="whitespace-pre-wrap">{opportunity.description}</p>
                 </div>
               </section>
@@ -186,10 +186,10 @@ function OpportunityDetailContent({ params }: PageProps) {
 
             {opportunity.mentor_areas && (
               <section>
-                <h3 className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-8 flex items-center gap-3">
+                <h3 className="text-xs font-bold uppercase tracking-widest text-gray-600 mb-8 flex items-center gap-3">
                   <span className="w-8 h-[1px] bg-gray-300"></span> Research Areas
                 </h3>
-                <div className="prose prose-lg font-sans text-gray-600 leading-[1.8]">
+                <div className="prose prose-lg  text-gray-800 leading-[1.8]">
                   {opportunity.mentor_areas}
                 </div>
               </section>
@@ -197,10 +197,10 @@ function OpportunityDetailContent({ params }: PageProps) {
 
             {opportunity.preferred_qualifications && cleanScrapedText(opportunity.preferred_qualifications) && (
               <section>
-                <h3 className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-8 flex items-center gap-3">
+                <h3 className="text-xs font-bold uppercase tracking-widest text-gray-700 mb-8 flex items-center gap-3">
                   <span className="w-8 h-[1px] bg-gray-300"></span> Qualifications
                 </h3>
-                <div className="prose prose-lg font-sans text-gray-700 leading-[1.8] whitespace-pre-wrap">
+                <div className="prose prose-lg  text-gray-700 leading-[1.8] whitespace-pre-wrap">
                   {cleanScrapedText(opportunity.preferred_qualifications)}
                 </div>
               </section>
@@ -208,7 +208,7 @@ function OpportunityDetailContent({ params }: PageProps) {
 
             {/* Skill Compatibility Section */}
             <section className="pt-12 border-t border-gray-200">
-              <h3 className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-8 flex items-center gap-3">
+              <h3 className="text-xs font-bold uppercase tracking-widest text-gray-700 mb-8 flex items-center gap-3">
                 <span className="w-8 h-[1px] bg-gray-300"></span> Fit Analysis
               </h3>
               <SkillAnalyzer opportunityId={id} />
@@ -216,7 +216,7 @@ function OpportunityDetailContent({ params }: PageProps) {
 
             {/* Email Generator Section */}
             <section className="pt-12 border-t border-gray-200">
-              <h3 className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-8 flex items-center gap-3">
+              <h3 className="text-xs font-bold uppercase tracking-widest text-gray-700 mb-8 flex items-center gap-3">
                 <span className="w-8 h-[1px] bg-gray-300"></span> Email Draft
               </h3>
 
@@ -225,7 +225,7 @@ function OpportunityDetailContent({ params }: PageProps) {
                   <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
                     <div>
                       <h4 className="font-serif text-2xl text-[#011F5B] mb-2">Ready to Apply?</h4>
-                      <p className="text-gray-600 font-sans">Draft a professional email to Dr. {opportunity.researcher_name?.split(' ').pop()} instantly.</p>
+                      <p className="text-gray-800 ">Draft a professional email to Dr. {opportunity.researcher_name?.split(' ').pop()} instantly.</p>
                     </div>
                     {!generatedEmail && !hasProfile && (
                       <Link href="/profile" className="px-5 py-2.5 bg-white border border-gray-200 text-[#011F5B] font-bold rounded-lg hover:bg-blue-50 transition text-sm shadow-sm">
@@ -248,7 +248,7 @@ function OpportunityDetailContent({ params }: PageProps) {
                       {/* Email Preview */}
                       <div className="space-y-4">
                         <div className="border-b border-gray-200 pb-4">
-                          <p className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-1">Subject</p>
+                          <p className="text-xs font-bold uppercase tracking-widest text-gray-700 mb-1">Subject</p>
                           <div className="flex justify-between items-center bg-white p-3 rounded-lg border border-gray-200">
                             <p className="font-medium text-gray-900 truncate pr-2">{generatedEmail.subject}</p>
                             <button onClick={() => copyToClipboard(generatedEmail.subject, 'subject')} className="text-xs text-[#011F5B] font-bold hover:underline shrink-0">
@@ -257,14 +257,14 @@ function OpportunityDetailContent({ params }: PageProps) {
                           </div>
                         </div>
                         <div>
-                          <p className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Body</p>
+                          <p className="text-xs font-bold uppercase tracking-widest text-gray-700 mb-2">Body</p>
                           <div className="relative">
                             <textarea
                               value={generatedEmail.body}
                               onChange={e => setGeneratedEmail({ ...generatedEmail, body: e.target.value })}
                               className="w-full min-h-[300px] bg-white border border-gray-200 rounded-xl p-6 font-mono text-sm text-gray-800 focus:ring-2 focus:ring-[#011F5B]/10 outline-none leading-relaxed resize-y shadow-sm"
                             />
-                            <button onClick={() => copyToClipboard(generatedEmail.body, 'body')} className="absolute top-4 right-4 text-xs bg-gray-100 hover:bg-gray-200 px-3 py-1 rounded text-gray-600 font-medium transition">
+                            <button onClick={() => copyToClipboard(generatedEmail.body, 'body')} className="absolute top-4 right-4 text-xs bg-gray-100 hover:bg-gray-200 px-3 py-1 rounded text-gray-800 font-medium transition">
                               {copied === 'body' ? 'Copied' : 'Copy Body'}
                             </button>
                           </div>
@@ -291,26 +291,26 @@ function OpportunityDetailContent({ params }: PageProps) {
           <div className="lg:col-span-4 space-y-16 lg:sticky lg:top-24 h-fit">
             {/* Contact Info (Clean) */}
             <div className="space-y-6">
-              <h3 className="text-xs font-bold uppercase tracking-widest text-gray-500">Researcher Contact</h3>
+              <h3 className="text-xs font-bold uppercase tracking-widest text-gray-700">Researcher Contact</h3>
               <div className="space-y-2">
                 {opportunity.researcher_email ? (
                   <div className="group flex items-center gap-3">
                     <span className="font-mono text-sm text-[#011F5B] border-b border-gray-200 pb-0.5">{opportunity.researcher_email}</span>
-                    <button onClick={() => copyToClipboard(opportunity.researcher_email!, 'email')} className="opacity-0 group-hover:opacity-100 transition-opacity text-gray-500 hover:text-[#011F5B]">
+                    <button onClick={() => copyToClipboard(opportunity.researcher_email!, 'email')} className="opacity-0 group-hover:opacity-100 transition-opacity text-gray-700 hover:text-[#011F5B]">
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
                     </button>
                   </div>
-                ) : <span className="text-gray-500 italic">No email listed</span>}
+                ) : <span className="text-gray-700 italic">No email listed</span>}
 
                 <div className="flex flex-col gap-2 pt-4">
                   {isValidUrl(opportunity.researcher_profile_url) && (
                     <a href={opportunity.researcher_profile_url!} target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-gray-900 hover:text-[#011F5B] transition-colors flex items-center gap-2">
-                      CURF Profile <span className="text-gray-400">↗</span>
+                      CURF Profile <span className="text-gray-600">↗</span>
                     </a>
                   )}
                   {isValidUrl(opportunity.department_page_url) && (
                     <a href={opportunity.department_page_url!} target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-gray-900 hover:text-[#011F5B] transition-colors flex items-center gap-2">
-                      Department Page <span className="text-gray-400">↗</span>
+                      Department Page <span className="text-gray-600">↗</span>
                     </a>
                   )}
                 </div>
@@ -319,7 +319,7 @@ function OpportunityDetailContent({ params }: PageProps) {
 
             {/* Requirements Pills */}
             <div className="space-y-6">
-              <h3 className="text-xs font-bold uppercase tracking-widest text-gray-500">Target Students</h3>
+              <h3 className="text-xs font-bold uppercase tracking-widest text-gray-700">Target Students</h3>
               <div className="flex flex-wrap gap-2">
                 {opportunity.preferred_student_years?.map(y => (
                   <span key={y} className="px-3 py-1 border border-gray-200 text-gray-700 text-[11px] font-bold uppercase tracking-widest rounded-full">
@@ -374,7 +374,7 @@ function SkillAnalyzer({ opportunityId }: SkillAnalyzerProps) {
         ) : (
           <>
             Analyze Fit
-            <span className="text-gray-400 group-hover:translate-x-1 transition-transform">→</span>
+            <span className="text-gray-600 group-hover:translate-x-1 transition-transform">→</span>
           </>
         )}
       </button>
@@ -388,11 +388,11 @@ function SkillAnalyzer({ opportunityId }: SkillAnalyzerProps) {
           {result.match_score}%
         </div>
         <div>
-          <p className="text-xs font-bold uppercase tracking-widest text-gray-500">Match Score</p>
+          <p className="text-xs font-bold uppercase tracking-widest text-gray-700">Match Score</p>
           <p className="text-sm font-medium text-gray-900">{result.match_score >= 80 ? 'High Compatibility' : 'Moderate Fit'}</p>
         </div>
       </div>
-      <p className="text-sm text-gray-600 leading-relaxed mb-6 border-b border-gray-100 pb-4">{result.analysis_text}</p>
+      <p className="text-sm text-gray-800 leading-relaxed mb-6 border-b border-gray-100 pb-4">{result.analysis_text}</p>
 
       <div className="space-y-4">
         <div>

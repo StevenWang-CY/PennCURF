@@ -33,7 +33,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${playfair.variable} ${interTight.variable} font-sans antialiased bg-[var(--background)] min-h-screen flex flex-col`}>
+      <body className={`${playfair.variable} ${interTight.variable} antialiased bg-[var(--background)] min-h-screen flex flex-col`}>
         <BackendStatusProvider>
           <BackendWakeUp />
           <AuthProvider>

@@ -67,7 +67,7 @@ export default function NavBar() {
                       <div className="absolute right-0 mt-3 w-56 bg-white/90 backdrop-blur-xl rounded-xl shadow-layered border border-[var(--border-subtle)] py-2 z-20 animate-in fade-in slide-in-from-top-2 duration-200">
                         <div className="px-4 py-2 border-b border-gray-100">
                           <p className="text-sm font-medium text-gray-900">{user.username}</p>
-                          <p className="text-xs text-gray-500">Penn Student</p>
+                          <p className="text-xs text-gray-700">Penn Student</p>
                         </div>
                         <Link
                           href="/profile"
