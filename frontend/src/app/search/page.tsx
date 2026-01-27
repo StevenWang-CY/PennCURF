@@ -394,7 +394,7 @@ function OpportunityItem({ opportunity, index, score, explanation }: { opportuni
             </h2>
             {score && (
               <span className="px-2 py-1 bg-green-50 text-green-700 text-[10px] font-bold uppercase tracking-wider rounded border border-green-100/50 opacity-60 group-hover:opacity-100 transition-opacity">
-                {Math.round(score / 10)}/10
+                {Math.round(score)}/10
               </span>
             )}
           </div>
