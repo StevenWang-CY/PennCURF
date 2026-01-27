@@ -398,12 +398,19 @@ function SkillAnalyzer({ opportunityId }: SkillAnalyzerProps) {
   return (
     <div className="animate-in fade-in slide-in-from-bottom-2">
       <div className="flex items-center gap-4 mb-4">
-        <div className={`text-4xl font-bold ${result.match_score >= 80 ? 'text-emerald-600' : result.match_score >= 50 ? 'text-yellow-600' : 'text-red-500'}`}>
+        <div className={`text-4xl font-bold ${result.match_score >= 80 ? 'text-emerald-600' :
+            result.match_score >= 60 ? 'text-blue-600' :
+              result.match_score >= 40 ? 'text-yellow-600' : 'text-red-500'
+          }`}>
           {result.match_score}%
         </div>
         <div>
           <p className="text-sm font-bold uppercase tracking-widest font-sans text-gray-700">Match Score</p>
-          <p className="text-sm font-medium text-gray-900">{result.match_score >= 80 ? 'High Compatibility' : 'Moderate Fit'}</p>
+          <p className="text-sm font-medium text-gray-900">
+            {result.match_score >= 80 ? 'High Compatibility' :
+              result.match_score >= 60 ? 'Good Fit' :
+                result.match_score >= 40 ? 'Moderate Fit' : 'Low Compatibility'}
+          </p>
         </div>
       </div>
       <p className="text-sm text-gray-800 leading-relaxed mb-6 border-b border-gray-100 pb-4">{result.analysis_text}</p>

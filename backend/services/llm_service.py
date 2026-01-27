@@ -929,7 +929,7 @@ Best regards,
         student_skills = student_profile.get("skills", [])
         student_experience = student_profile.get("experience", "")
 
-        prompt = f"""Analyze the skill compatibility between this student and the research opportunity.
+        prompt = f"""Analyze the skill and domain compatibility between this student and the research opportunity.
 
 OPPORTUNITY:
 - Title: {project_title}
@@ -941,19 +941,25 @@ STUDENT:
 - Skills: {', '.join(student_skills) if student_skills else 'Not specified'}
 - Experience: {student_experience if student_experience else 'Not specified'}
 
-TASK:
-1. Extract required technical and soft skills from the opportunity.
-2. Compare them with the student's skills and experience.
-3. Identify which required skills the student HAS (matches).
-4. Identify which required skills the student NEEDS (missing).
-5. Assign a compatibility score (0-100) based on how well they fit.
+SCORING RUBRIC:
+0-40 (Low Match): Significant domain mismatch (e.g., Biology student applying for History research) OR lacks critical required skills.
+41-60 (Moderate Match): Partial match. Relevant domain but missing key skills, OR irrelevant domain but strong transferable skills (e.g., CS student applying for Digital Humanities).
+61-80 (Good Match): Domain alignment AND has most required skills (or ability to learn quickly).
+81-100 (Excellent Match): Perfect domain fit AND possesses specific technical skills/experience mentioned in the opportunity.
+
+INSTRUCTIONS:
+1. Identify the core domain of the research (e.g., Computer Science, Biology, Humanities).
+2. Check if the student's Major aligns with this domain. IF DOMAIN MISMATCH: Cap score at 60 unless the project EXPLICITLY asks for the student's specific interdisciplinary skills (e.g. "Needs a programmer for a History DB").
+3. Check for specific hard skills (e.g., Python, Wet Lab, Stata). Mismatched hard skills should lower the score significantly.
+4. Assign a score (0-100) based on the rubric.
+5. Generate a brief 1-sentence analysis summary.
 
 Return ONLY valid JSON in this format:
 {{
     "match_score": 85,
-    "matched_skills": ["Python", "Data Analysis"],
-    "missing_skills": ["React", "AWS"],
-    "analysis_text": "A brief 1-sentence summary of the fit."
+    "matched_skills": ["List", "of", "matched", "skills"],
+    "missing_skills": ["List", "of", "missing", "skills"],
+    "analysis_text": "Brief one-sentence explanation of the score."
 }}
 """
         try:
