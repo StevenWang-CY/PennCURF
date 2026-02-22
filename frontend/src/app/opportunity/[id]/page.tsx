@@ -137,10 +137,13 @@ function OpportunityDetailContent({ params }: PageProps) {
       <div className="relative z-10 max-w-5xl mx-auto px-6 py-20 md:py-32">
         {/* Navigation */}
         <div className="mb-24">
-          <Link href="/search" className="group flex items-center gap-2 text-sm font-bold uppercase tracking-widest font-sans text-gray-600 hover:text-[#011F5B] transition-colors">
+          <button
+            onClick={() => router.back()}
+            className="group flex items-center gap-2 text-sm font-bold uppercase tracking-widest font-sans text-gray-600 hover:text-[#011F5B] transition-colors"
+          >
             <svg className="w-4 h-4 transform group-hover:-translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
             Research Directory
-          </Link>
+          </button>
         </div>
 
         {/* Editorial Header */}

@@ -14,6 +14,44 @@ export default function SearchPage() {
   );
 }
 
+// Filter state
+interface FilterState {
+  research_categories?: string[];
+  preferred_student_years?: string[];
+  is_paid?: boolean;
+  is_volunteer?: boolean;
+  is_work_study?: boolean;
+}
+
+const SEARCH_STATE_KEY = 'penncurf_search_state';
+
+function saveSearchState(state: {
+  query: string;
+  searchMode: 'filter' | 'natural';
+  activeFilters: FilterState;
+  searchResults: SearchResult[];
+  opportunities: ResearchOpportunity[];
+}) {
+  try {
+    sessionStorage.setItem(SEARCH_STATE_KEY, JSON.stringify(state));
+  } catch { /* ignore quota errors */ }
+}
+
+function loadSearchState(): {
+  query: string;
+  searchMode: 'filter' | 'natural';
+  activeFilters: FilterState;
+  searchResults: SearchResult[];
+  opportunities: ResearchOpportunity[];
+} | null {
+  try {
+    const raw = sessionStorage.getItem(SEARCH_STATE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
 function SearchContent() {
   const { profileId, hasProfile } = useProfile();
   const [opportunities, setOpportunities] = useState<ResearchOpportunity[]>([]);
@@ -23,32 +61,45 @@ function SearchContent() {
   const [searching, setSearching] = useState(false);
   const [searchMode, setSearchMode] = useState<'filter' | 'natural'>('natural');
 
-  // Filter state
-  interface FilterState {
-    research_categories?: string[];
-    preferred_student_years?: string[];
-    is_paid?: boolean;
-    is_volunteer?: boolean;
-    is_work_study?: boolean;
-  }
   const [activeFilters, setActiveFilters] = useState<FilterState>({});
 
   // Natural language search
   const [query, setQuery] = useState('');
 
+  // Persist search state to sessionStorage on changes
   useEffect(() => {
-    // Load filter options and initial opportunities
-    Promise.all([
-      api.getFilterOptions(),
-      api.getOpportunities()
-    ]).then(([options, opps]) => {
+    if (!loading) {
+      saveSearchState({ query, searchMode, activeFilters, searchResults, opportunities });
+    }
+  }, [query, searchMode, activeFilters, searchResults, opportunities, loading]);
+
+  useEffect(() => {
+    // Try to restore previous search state
+    const saved = loadSearchState();
+
+    // Always load filter options
+    api.getFilterOptions().then(options => {
       setFilterOptions(options);
-      setOpportunities(opps);
+    }).catch(err => console.error('Error loading filter options:', err));
+
+    if (saved && (saved.searchResults.length > 0 || saved.query)) {
+      // Restore previous search state
+      setQuery(saved.query);
+      setSearchMode(saved.searchMode);
+      setActiveFilters(saved.activeFilters);
+      setSearchResults(saved.searchResults);
+      setOpportunities(saved.opportunities);
       setLoading(false);
-    }).catch(err => {
-      console.error('Error loading data:', err);
-      setLoading(false);
-    });
+    } else {
+      // Fresh load
+      api.getOpportunities().then(opps => {
+        setOpportunities(opps);
+        setLoading(false);
+      }).catch(err => {
+        console.error('Error loading data:', err);
+        setLoading(false);
+      });
+    }
   }, []);
 
   const handleFilterSearch = async () => {
@@ -100,6 +151,8 @@ function SearchContent() {
   const clearFilters = () => {
     setActiveFilters({});
     setQuery('');
+    setSearchResults([]);
+    try { sessionStorage.removeItem(SEARCH_STATE_KEY); } catch { /* ignore */ }
   };
 
   const displayedOpportunities = searchResults.length > 0
@@ -287,7 +340,7 @@ function SearchContent() {
           {!query && !searching ? (
             /* Initial State: Featured Grid */
             <div className="space-y-8">
-              <h3 className="text-sm font-bold uppercase tracking-widest text-gray-600 border-b border-gray-100 pb-4">
+              <h3 className="text-xs font-bold uppercase tracking-widest text-gray-400 pb-4">
                 Featured Research
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
