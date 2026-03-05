@@ -1,6 +1,6 @@
 # Penn CURF Research Finder
 
-**Live Demo:** [penn-curf.vercel.app](https://penn-curf.vercel.app)
+**Live Demo:** [penncurf.vercel.app](https://penncurf.vercel.app)
 
 An AI-powered platform for University of Pennsylvania students to discover, analyze, and apply for undergraduate research opportunities. Leveraging LLM-based semantic search and intelligent matching, this tool bridges the gap between students and faculty research positions.
 
@@ -197,8 +197,8 @@ App available at `http://localhost:3000`
 
 | Component | Platform | URL |
 |-----------|----------|-----|
-| Frontend | Vercel | [penn-curf.vercel.app](https://penn-curf.vercel.app) |
-| Backend | Render | [penncurf-api.onrender.com](https://penncurf-api.onrender.com) |
+| Frontend | Vercel | [penncurf.vercel.app](https://penncurf.vercel.app) |
+| Backend | Render | [penncurf.onrender.com](https://penncurf.onrender.com) |
 | Database | Supabase | Managed PostgreSQL |
 
 ### Cold Start Optimization
@@ -213,7 +213,7 @@ Render's free tier spins down after ~15 minutes of inactivity, causing 30-60 sec
 5. **Visibility-Aware**: Pings when user returns to tab after being away
 
 **External Option:**
-Use a free cron service like [cron-job.org](https://cron-job.org) to ping `https://penncurf-api.onrender.com/health` every 14 minutes.
+Use a free cron service like [cron-job.org](https://cron-job.org) to ping `https://penncurf.onrender.com/health` every 14 minutes.
 
 ### Deploy Your Own
 
