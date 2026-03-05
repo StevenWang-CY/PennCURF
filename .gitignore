@@ -30,3 +30,9 @@ npm-debug.log*
 
 # Scraper progress
 scraper_progress.json
+
+# Vercel
+.vercel/
+
+# Backend logs
+backend.log

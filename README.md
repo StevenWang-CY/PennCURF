@@ -267,6 +267,14 @@ Key tables in Supabase:
 
 See `backend/database/schema.sql` for full schema.
 
+## Contributing
+
+Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on how to get started.
+
+## Code of Conduct
+
+This project follows the [Contributor Covenant](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code.
+
 ## License
 
 MIT

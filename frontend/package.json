@@ -1,7 +1,14 @@
 {
-  "name": "frontend",
+  "name": "penncurf-frontend",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
+  "description": "AI-powered Penn undergraduate research opportunity finder",
+  "license": "MIT",
+  "author": "Chuyue Wang",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/StevenWang-CY/PennCURF"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
