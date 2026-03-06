@@ -376,12 +376,18 @@ class CURFScraper:
 
             time.sleep(0.5)  # Rate limiting
 
+        # Phase 3: Delete stale opportunities not found in current scrape
+        print("\nPhase 3: Removing stale opportunities...")
+        scraped_slugs = [p["slug"] for p in all_projects]
+        deleted_count = self.db.delete_opportunities_not_in(scraped_slugs)
+        print(f"  Deleted {deleted_count} stale opportunities from database")
+
         # Clean up progress file
         if os.path.exists(PROGRESS_FILE):
             os.remove(PROGRESS_FILE)
 
         print("\n" + "=" * 60)
-        print(f"Scraping complete! Processed {len(all_projects)} projects.")
+        print(f"Scraping complete! Processed {len(all_projects)} projects, deleted {deleted_count} stale entries.")
         print("=" * 60)
 
 

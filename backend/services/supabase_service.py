@@ -92,6 +92,24 @@ class SupabaseService:
         )
         return result.data
 
+    def get_all_slugs(self) -> List[str]:
+        """Get all opportunity slugs from database"""
+        result = (
+            self.client.table("research_opportunities")
+            .select("slug")
+            .execute()
+        )
+        return [row["slug"] for row in result.data]
+
+    def delete_opportunities_not_in(self, valid_slugs: List[str]) -> int:
+        """Delete opportunities whose slugs are not in the provided list. Returns count deleted."""
+        existing_slugs = self.get_all_slugs()
+        valid_set = set(valid_slugs)
+        stale_slugs = [s for s in existing_slugs if s not in valid_set]
+        for slug in stale_slugs:
+            self.client.table("research_opportunities").delete().eq("slug", slug).execute()
+        return len(stale_slugs)
+
     def get_all_opportunities_for_search(self) -> List[Dict[str, Any]]:
         """Get all opportunities with minimal fields for LLM search"""
         result = (
