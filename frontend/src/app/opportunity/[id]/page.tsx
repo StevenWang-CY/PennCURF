@@ -98,7 +98,7 @@ function OpportunityDetailContent({ params }: PageProps) {
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen bg-[var(--background)]">
-        <div className="w-10 h-10 border-[3px] border-gray-100 border-t-[#011F5B] rounded-full animate-spin"></div>
+        <div className="w-8 h-8 border-[0.5px] border-[#011F5B]/20 border-t-[#011F5B] rounded-full animate-spin"></div>
       </div>
     );
   }
@@ -106,8 +106,8 @@ function OpportunityDetailContent({ params }: PageProps) {
   if (!opportunity) {
     return (
       <div className="text-center py-40 min-h-screen flex flex-col items-center justify-center bg-[var(--background)]">
-        <h1 className="text-3xl font-serif text-[#011F5B] mb-6 tracking-tight">Opportunity Not Found</h1>
-        <Link href="/search" className="text-[11px] font-semibold uppercase tracking-[0.2em] font-sans text-gray-500 hover:text-[#011F5B] transition-colors duration-300">
+        <h1 className="text-2xl font-serif text-[#011F5B] mb-6 tracking-tight">Opportunity Not Found</h1>
+        <Link href="/search" className="text-[10px] uppercase tracking-[0.2em] font-sans text-gray-500 hover:text-[#011F5B] transition-colors duration-300">
           Return to directory
         </Link>
       </div>
@@ -116,47 +116,49 @@ function OpportunityDetailContent({ params }: PageProps) {
 
   return (
     <div className="min-h-screen bg-[var(--background)] text-gray-900 selection:bg-[#011F5B] selection:text-white font-sans">
+      {/* Hyper-delicate background noise */}
+      <div className="fixed inset-0 pointer-events-none z-0 opacity-[0.012] mix-blend-overlay" style={{backgroundImage: 'url("https://grainy-gradients.vercel.app/noise.svg")'}}></div>
 
       {/* Extreme minimal nav */}
-      <nav className="w-full border-b-[0.5px] border-gray-100/50">
-         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-6">
+      <nav className="w-full border-b-[0.5px] border-gray-100 relative z-10">
+         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-5 border-b-[0.5px] border-transparent">
             <button
                onClick={() => router.back()}
-               className="group flex items-center gap-4 text-[11px] font-semibold uppercase tracking-[0.2em] font-sans text-gray-400 hover:text-[#011F5B] transition-all duration-300"
+               className="group flex items-center gap-4 text-[10px] uppercase tracking-[0.2em] font-sans text-gray-400 hover:text-[#011F5B] transition-all duration-500"
             >
-               <span className="w-8 h-[1px] bg-gray-200 group-hover:bg-[#011F5B] group-hover:w-12 transition-all duration-500"></span>
+               <span className="w-6 h-[0.5px] bg-gray-300 group-hover:bg-[#011F5B] group-hover:w-10 transition-all duration-500"></span>
                Research Directory
             </button>
          </div>
       </nav>
 
       {/* Main Content Area */}
-      <main className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-16 md:py-24">
+      <main className="relative z-10 max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-16 md:py-24">
         
         {/* Header Ribbon / Title Block */}
         <header className="mb-20 lg:mb-28 max-w-4xl relative">
-          <div className="flex flex-wrap items-center gap-3 mb-8">
+          <div className="flex flex-wrap items-center gap-4 mb-8">
             {opportunity.is_paid && (
-              <span className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-[#011F5B]">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#011F5B]"></span>
+              <span className="flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] text-[#011F5B]">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#011F5B]/20 border-[0.5px] border-[#011F5B]"></span>
                 Paid Position
               </span>
             )}
             {opportunity.research_categories?.map(cat => (
-               <span key={cat} className="text-[11px] font-semibold uppercase tracking-[0.2em] text-gray-400">
+               <span key={cat} className="text-[10px] uppercase tracking-[0.2em] text-gray-400">
                  {cat}
                </span>
             ))}
           </div>
 
-          <h1 className="font-serif text-5xl sm:text-6xl md:text-7xl leading-[1.05] text-[#011F5B] mb-10 tracking-tight">
+          <h1 className="font-serif text-5xl sm:text-6xl md:text-7xl leading-[1.05] text-[#011F5B] mb-10 tracking-tight font-light">
             {opportunity.title}
           </h1>
 
-          <div className="flex flex-col sm:flex-row sm:items-baseline gap-3 text-[17px] font-sans text-gray-600">
-            {opportunity.researcher_name && <span className="font-medium text-[#011F5B] tracking-wide">{opportunity.researcher_name}</span>}
-            {opportunity.researcher_name && opportunity.researcher_title && <span className="hidden sm:inline text-gray-300 font-light">/</span>}
-            {opportunity.researcher_title && <span className="font-light">{opportunity.researcher_title}</span>}
+          <div className="flex flex-col sm:flex-row sm:items-baseline gap-3 text-[16px] font-sans text-gray-500 font-light">
+            {opportunity.researcher_name && <span className="text-[#011F5B] tracking-wide">{opportunity.researcher_name}</span>}
+            {opportunity.researcher_name && opportunity.researcher_title && <span className="hidden sm:inline text-gray-300">/</span>}
+            {opportunity.researcher_title && <span>{opportunity.researcher_title}</span>}
           </div>
         </header>
 
@@ -167,110 +169,113 @@ function OpportunityDetailContent({ params }: PageProps) {
           <div className="lg:col-span-8 space-y-20">
             
                {opportunity.description && (
-                 <section>
-                   <h3 className="text-3xl font-serif text-[#011F5B] mb-6">Project Overview</h3>
-                   <div className="text-[17px] text-gray-800 leading-[1.8] max-w-[65ch] whitespace-pre-wrap font-serif" style={{ fontFamily: 'Georgia, serif' }}>
+                 <section className="relative group">
+                   <div className="absolute left-[-2rem] top-2 bottom-0 w-[0.5px] bg-gray-100 group-hover:bg-[#011F5B]/10 transition-colors hidden sm:block"></div>
+                   <h3 className="text-2xl font-serif text-[#011F5B] mb-6 font-light">Project Overview</h3>
+                   <div className="text-[16px] text-gray-700 leading-[1.85] max-w-[65ch] whitespace-pre-wrap font-serif font-light" style={{ fontFamily: 'Georgia, serif' }}>
                      {opportunity.description}
                    </div>
                  </section>
                )}
 
                {opportunity.mentor_areas && (
-                 <section>
-                   <h3 className="text-3xl font-serif text-[#011F5B] mb-6">Research Areas</h3>
-                   <div className="text-[17px] text-gray-800 leading-[1.8] max-w-[65ch] font-serif" style={{ fontFamily: 'Georgia, serif' }}>
+                 <section className="relative group">
+                   <div className="absolute left-[-2rem] top-2 bottom-0 w-[0.5px] bg-gray-100 group-hover:bg-[#011F5B]/10 transition-colors hidden sm:block"></div>
+                   <h3 className="text-2xl font-serif text-[#011F5B] mb-6 font-light">Research Areas</h3>
+                   <div className="text-[16px] text-gray-700 leading-[1.85] max-w-[65ch] font-serif font-light" style={{ fontFamily: 'Georgia, serif' }}>
                      {opportunity.mentor_areas}
                    </div>
                  </section>
                )}
 
                {opportunity.preferred_qualifications && cleanScrapedText(opportunity.preferred_qualifications) && (
-                 <section>
-                   <h3 className="text-3xl font-serif text-[#011F5B] mb-6">Qualifications</h3>
-                   <div className="text-[17px] text-gray-800 leading-[1.8] max-w-[65ch] whitespace-pre-wrap font-serif" style={{ fontFamily: 'Georgia, serif' }}>
+                 <section className="relative group">
+                   <div className="absolute left-[-2rem] top-2 bottom-0 w-[0.5px] bg-gray-100 group-hover:bg-[#011F5B]/10 transition-colors hidden sm:block"></div>
+                   <h3 className="text-2xl font-serif text-[#011F5B] mb-6 font-light">Qualifications</h3>
+                   <div className="text-[16px] text-gray-700 leading-[1.85] max-w-[65ch] whitespace-pre-wrap font-serif font-light" style={{ fontFamily: 'Georgia, serif' }}>
                      {cleanScrapedText(opportunity.preferred_qualifications)}
                    </div>
                  </section>
                )}
 
 
-            {/* Rich Feature Boxes (Fit Analysis & Email) */}
+            {/* Delicate Feature Boxes (Fit Analysis & Email) */}
             <div className="pt-8 space-y-12">
                
-               {/* Box 1: Compatibility Engine (Elevated White Card) */}
-               <section className="bg-white rounded-[1.5rem] shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-gray-100 p-8 sm:p-12 relative overflow-hidden">
-                 <div className="absolute top-0 right-0 w-64 h-64 bg-[#011F5B]/3 rounded-full mix-blend-multiply blur-3xl pointer-events-none"></div>
+               {/* Box 1: Compatibility Engine */}
+               <section className="bg-white rounded-2xl shadow-[0_4px_20px_rgb(0,0,0,0.02)] border-[0.5px] border-[#011F5B]/10 p-8 sm:p-12 relative overflow-hidden transition-all duration-500 hover:shadow-[0_8px_30px_rgb(1,31,91,0.04)]">
+                 <div className="absolute top-0 right-0 w-64 h-64 bg-slate-50/50 rounded-full mix-blend-multiply blur-3xl pointer-events-none"></div>
                  
                  <div className="relative z-10 w-full">
-                    <h3 className="text-2xl font-serif text-[#011F5B] mb-8">Compatibility Engine</h3>
+                    <h3 className="text-xl font-serif text-[#011F5B] mb-8 font-light italic">Compatibility Engine</h3>
                     <SkillAnalyzer opportunityId={id} />
                  </div>
                </section>
 
-               {/* Box 2: Outreach Protocol (Rich Penn Blue Gradient Card) */}
-               <section className="bg-gradient-to-br from-[#011F5B] to-[#001033] rounded-[1.5rem] shadow-xl p-8 sm:p-12 relative overflow-hidden text-white">
-                 <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[150%] bg-[#990000]/10 rounded-full mix-blend-screen filter blur-[60px] pointer-events-none"></div>
+               {/* Box 2: Outreach Protocol */}
+               <section className="bg-white rounded-2xl shadow-[0_4px_20px_rgb(0,0,0,0.02)] border-[0.5px] border-[#011F5B]/10 p-8 sm:p-12 relative overflow-hidden transition-all duration-500 hover:shadow-[0_8px_30px_rgb(1,31,91,0.04)]">
+                 <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-gradient-to-bl from-blue-50/40 via-transparent to-transparent opacity-60 rounded-full mix-blend-multiply pointer-events-none transform translate-x-1/3 -translate-y-1/3"></div>
 
                  <div className="relative z-10 w-full">
-                   <h3 className="text-2xl font-serif text-white mb-8">Outreach Protocol</h3>
+                   <h3 className="text-xl font-serif text-[#011F5B] mb-8 font-light italic">Outreach Protocol</h3>
 
                    {!generatedEmail ? (
                       <div className="flex flex-col gap-8">
-                        <p className="font-serif text-[17px] text-white/80 leading-[1.8] max-w-[60ch]" style={{ fontFamily: 'Georgia, serif' }}>
+                        <p className="font-serif text-[16px] text-gray-600 leading-[1.85] max-w-[60ch] font-light" style={{ fontFamily: 'Georgia, serif' }}>
                           Synthesize your profile vector array into a highly-calibrated, professional email draft. This protocol bridges the gap between your established prerequisites and the project requirements.
                         </p>
                         {hasProfile ? (
                           <button
                             onClick={() => handleGenerateEmail()}
                             disabled={generatingEmail}
-                            className="w-fit flex items-center justify-between gap-6 py-4 px-8 bg-white hover:bg-gray-50 text-[#011F5B] text-[13px] font-bold uppercase tracking-widest rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed font-sans"
+                            className="w-fit flex items-center justify-between gap-6 py-3 px-8 border-[0.5px] border-[#011F5B]/30 bg-transparent hover:bg-slate-50 text-[#011F5B] text-[10px] uppercase tracking-[0.2em] rounded-full transition-all duration-500 disabled:opacity-50 disabled:cursor-not-allowed font-sans"
                           >
                             {generatingEmail ? (
                                <>
-                                 <div className="w-4 h-4 border-[2px] border-[#011F5B]/30 border-t-[#011F5B] rounded-full animate-spin"></div>
-                                 Synthesizing Draft...
+                                 <div className="w-3 h-3 border-[0.5px] border-[#011F5B]/30 border-t-[#011F5B] rounded-full animate-spin"></div>
+                                 Synthesizing Draft
                                </>
                             ) : 'Initialize Draft'}
                           </button>
                         ) : (
-                          <Link href="/profile" className="w-fit flex items-center justify-between gap-6 py-4 px-8 bg-white hover:bg-gray-50 text-[#011F5B] text-[13px] font-bold uppercase tracking-widest rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 font-sans">
+                          <Link href="/profile" className="w-fit flex items-center justify-between gap-6 py-3 px-8 border-[0.5px] border-[#011F5B]/30 bg-transparent hover:bg-slate-50 text-[#011F5B] text-[10px] uppercase tracking-[0.2em] rounded-full transition-all duration-500 font-sans">
                             Establish Profile
                           </Link>
                         )}
                       </div>
                     ) : (
-                      <div className="space-y-10 animate-in fade-in duration-500">
-                        <div className="space-y-6">
-                           <div className="border-b-[0.5px] border-white/20 pb-4 flex flex-col gap-2 group">
+                      <div className="space-y-10 animate-in fade-in duration-700">
+                        <div className="space-y-8">
+                           <div className="border-b-[0.5px] border-gray-100 pb-6 flex flex-col gap-3 group">
                               <div className="flex justify-between items-center">
-                                <span className="text-[11px] font-semibold uppercase tracking-widest text-white/50 block font-sans">Subject</span>
-                                <button onClick={() => copyToClipboard(generatedEmail.subject, 'subject')} className="text-[11px] uppercase tracking-widest text-white/70 hover:text-white font-bold transition-all opacity-0 group-hover:opacity-100 font-sans">
+                                <span className="text-[9px] uppercase tracking-[0.2em] text-[#011F5B]/40 block font-sans">Subject Payload</span>
+                                <button onClick={() => copyToClipboard(generatedEmail.subject, 'subject')} className="text-[9px] uppercase tracking-[0.2em] text-[#011F5B]/60 hover:text-[#011F5B] transition-all opacity-0 group-hover:opacity-100 font-sans">
                                   {copied === 'subject' ? 'Copied' : 'Copy'}
                                 </button>
                               </div>
-                              <span className="font-serif text-[18px] text-white" style={{ fontFamily: 'Georgia, serif' }}>{generatedEmail.subject}</span>
+                              <span className="font-serif text-[17px] text-gray-800 font-light" style={{ fontFamily: 'Georgia, serif' }}>{generatedEmail.subject}</span>
                            </div>
                            
-                           <div className="group relative pt-2">
-                              <div className="flex justify-between items-center mb-4">
-                                <span className="text-[11px] font-semibold uppercase tracking-widest text-white/50 block font-sans">Body Content</span>
-                                <button onClick={() => copyToClipboard(generatedEmail.body, 'body')} className="text-[11px] uppercase tracking-widest text-white/70 hover:text-white font-bold transition-all opacity-0 group-hover:opacity-100 font-sans">
+                           <div className="group relative">
+                              <div className="flex justify-between items-center mb-6">
+                                <span className="text-[9px] uppercase tracking-[0.2em] text-[#011F5B]/40 block font-sans">Body Syntax</span>
+                                <button onClick={() => copyToClipboard(generatedEmail.body, 'body')} className="text-[9px] uppercase tracking-[0.2em] text-[#011F5B]/60 hover:text-[#011F5B] transition-all opacity-0 group-hover:opacity-100 font-sans">
                                   {copied === 'body' ? 'Copied' : 'Copy Payload'}
                                 </button>
                               </div>
                               <textarea
                                 value={generatedEmail.body}
                                 onChange={e => setGeneratedEmail({ ...generatedEmail, body: e.target.value })}
-                                className="w-full min-h-[400px] bg-white/5 border border-white/10 rounded-xl p-8 font-serif text-[16px] text-white/90 leading-[1.8] resize-y focus:outline-none focus:border-white/30 focus:bg-white/10 transition-colors shadow-inner backdrop-blur-sm" style={{ fontFamily: 'Georgia, serif' }}
+                                className="w-full min-h-[400px] bg-transparent border-[0.5px] border-gray-200 rounded-xl p-8 font-serif text-[15px] text-gray-700 font-light leading-[1.9] resize-y focus:outline-none focus:border-[#011F5B]/30 focus:bg-white transition-colors" style={{ fontFamily: 'Georgia, serif' }}
                               />
                            </div>
                         </div>
 
-                        <div className="flex flex-wrap items-center gap-4 pt-4">
-                          <button onClick={() => copyToClipboard(`Subject: ${generatedEmail.subject}\n\n${generatedEmail.body}`, 'body')} className="py-4 px-8 bg-white hover:bg-gray-50 text-[#011F5B] text-[12px] font-bold uppercase tracking-widest rounded-xl hover:-translate-y-0.5 transition-all duration-300 shadow-lg hover:shadow-xl font-sans">
+                        <div className="flex flex-wrap items-center gap-4 pt-2">
+                          <button onClick={() => copyToClipboard(`Subject: ${generatedEmail.subject}\n\n${generatedEmail.body}`, 'body')} className="py-3 px-8 bg-[#011F5B] text-white text-[10px] uppercase tracking-[0.2em] rounded-full hover:bg-[#001033] transition-all duration-500 font-sans shadow-sm">
                             Copy Final Output
                           </button>
-                          <button onClick={() => handleGenerateEmail()} className="py-4 px-8 bg-white/10 hover:bg-white/20 border border-white/20 text-white text-[12px] font-bold uppercase tracking-widest rounded-xl hover:-translate-y-0.5 transition-all duration-300 font-sans">
+                          <button onClick={() => handleGenerateEmail()} className="py-3 px-8 bg-transparent border-[0.5px] border-gray-300 text-gray-500 text-[10px] uppercase tracking-[0.2em] rounded-full hover:bg-gray-50 hover:text-gray-900 transition-all duration-500 font-sans">
                             Regenerate
                           </button>
                         </div>
@@ -288,29 +293,32 @@ function OpportunityDetailContent({ params }: PageProps) {
                
                {/* Principal Investigator */}
                <div className="space-y-6">
-                 <h3 className="text-2xl font-serif text-[#011F5B] mb-6 block">Investigator</h3>
+                 <div className="flex items-center gap-4 mb-6">
+                    <h3 className="text-[17px] font-serif italic text-gray-400 font-light block">Investigator</h3>
+                    <span className="flex-1 h-[0.5px] bg-gray-100"></span>
+                 </div>
                  
                  <div className="space-y-6">
                    {opportunity.researcher_email ? (
-                     <div className="group flex items-center gap-3 bg-white p-4 rounded-xl border border-gray-100 shadow-sm transition-shadow hover:shadow-md">
-                       <span className="font-sans text-[15px] text-[#011F5B] font-medium selection:bg-blue-100">
+                     <div className="group flex items-center gap-3">
+                       <span className="font-sans text-[14px] text-gray-700 font-light tracking-wide selection:bg-blue-50">
                           {opportunity.researcher_email}
                        </span>
-                       <button onClick={() => copyToClipboard(opportunity.researcher_email!, 'email')} className="opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-[#011F5B] ml-auto">
-                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+                       <button onClick={() => copyToClipboard(opportunity.researcher_email!, 'email')} className="opacity-0 group-hover:opacity-100 transition-opacity text-gray-300 hover:text-[#011F5B] ml-auto">
+                         <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
                        </button>
                      </div>
-                   ) : <span className="text-gray-500 font-serif text-[15px] italic">No direct line listed</span>}
+                   ) : <span className="text-gray-400 font-serif text-[14px] italic font-light">No direct line listed</span>}
    
-                   <div className="flex flex-col gap-3">
+                   <div className="flex flex-col gap-0">
                      {isValidUrl(opportunity.researcher_profile_url) && (
-                       <a href={opportunity.researcher_profile_url!} target="_blank" rel="noopener noreferrer" className="group text-[15px] font-medium font-sans text-gray-600 hover:text-[#011F5B] transition-colors flex items-center justify-between w-full py-4 border-b-[0.5px] border-gray-200 hover:border-[#011F5B]">
-                         External Profile <span className="text-gray-400 group-hover:text-[#011F5B] transition-colors ml-1">↗</span>
+                       <a href={opportunity.researcher_profile_url!} target="_blank" rel="noopener noreferrer" className="group text-[14px] font-light font-sans text-gray-500 hover:text-[#011F5B] transition-colors flex items-center justify-between w-full py-4 border-b-[0.5px] border-gray-100">
+                         External Profile <span className="text-gray-300 group-hover:text-[#011F5B] transition-colors ml-1 font-light">↗</span>
                        </a>
                      )}
                      {isValidUrl(opportunity.department_page_url) && (
-                       <a href={opportunity.department_page_url!} target="_blank" rel="noopener noreferrer" className="group text-[15px] font-medium font-sans text-gray-600 hover:text-[#011F5B] transition-colors flex items-center justify-between w-full py-4 border-b-[0.5px] border-gray-200 hover:border-[#011F5B]">
-                         Department Page <span className="text-gray-400 group-hover:text-[#011F5B] transition-colors ml-1">↗</span>
+                       <a href={opportunity.department_page_url!} target="_blank" rel="noopener noreferrer" className="group text-[14px] font-light font-sans text-gray-500 hover:text-[#011F5B] transition-colors flex items-center justify-between w-full py-4 border-b-[0.5px] border-gray-100">
+                         Department Page <span className="text-gray-300 group-hover:text-[#011F5B] transition-colors ml-1 font-light">↗</span>
                        </a>
                      )}
                    </div>
@@ -319,15 +327,18 @@ function OpportunityDetailContent({ params }: PageProps) {
    
                {/* Classifications Rail */}
                <div className="space-y-6 pt-6">
-                 <h3 className="text-2xl font-serif text-[#011F5B] mb-6 block">Classification</h3>
+                 <div className="flex items-center gap-4 mb-6">
+                    <h3 className="text-[17px] font-serif italic text-gray-400 font-light block">Classification</h3>
+                    <span className="flex-1 h-[0.5px] bg-gray-100"></span>
+                 </div>
                  
-                 <div className="flex flex-col gap-6">
+                 <div className="flex flex-col gap-8">
                     {opportunity.preferred_student_years?.length ? (
-                       <div className="flex flex-col gap-3">
-                          <span className="text-[13px] font-bold text-gray-400 uppercase tracking-widest font-sans">Target Years</span>
+                       <div className="flex flex-col gap-4">
+                          <span className="text-[9px] text-gray-400 uppercase tracking-[0.2em] font-sans">Target Years</span>
                           <div className="flex flex-wrap gap-2">
                             {opportunity.preferred_student_years.map(year => (
-                              <span key={year} className="bg-gray-50 border border-gray-200 text-gray-700 text-[13px] font-medium px-4 py-1.5 rounded-full font-sans shadow-sm">
+                              <span key={year} className="bg-transparent border-[0.5px] border-gray-200 text-gray-500 text-[11px] font-light uppercase tracking-widest px-4 py-1.5 rounded-full font-sans transition-colors hover:border-gray-400">
                                 {year}
                               </span>
                             ))}
@@ -336,11 +347,11 @@ function OpportunityDetailContent({ params }: PageProps) {
                     ) : null}
 
                     {opportunity.academic_terms?.length ? (
-                       <div className="flex flex-col gap-3">
-                          <span className="text-[13px] font-bold text-gray-400 uppercase tracking-widest font-sans">Academic Terms</span>
+                       <div className="flex flex-col gap-4">
+                          <span className="text-[9px] text-gray-400 uppercase tracking-[0.2em] font-sans">Academic Terms</span>
                           <div className="flex flex-wrap gap-2">
                             {opportunity.academic_terms.map(term => (
-                              <span key={term} className="bg-blue-50 border border-blue-100 text-[#011F5B] text-[13px] font-medium px-4 py-1.5 rounded-full font-sans shadow-sm">
+                              <span key={term} className="bg-transparent border-[0.5px] border-[#011F5B]/20 text-[#011F5B]/80 text-[11px] font-light uppercase tracking-widest px-4 py-1.5 rounded-full font-sans transition-colors hover:border-[#011F5B]/50">
                                 {term}
                               </span>
                             ))}
@@ -382,19 +393,19 @@ function SkillAnalyzer({ opportunityId }: SkillAnalyzerProps) {
 
   if (!result) {
     return (
-      <div className="flex flex-col gap-10">
-        <p className="font-serif text-[17px] text-gray-700 leading-[1.8] max-w-[60ch]" style={{ fontFamily: 'Georgia, serif' }}>
+      <div className="flex flex-col gap-8">
+        <p className="font-serif text-[16px] text-gray-600 leading-[1.85] max-w-[60ch] font-light" style={{ fontFamily: 'Georgia, serif' }}>
           Execute the cross-calibration function to match your profile vector against the technical prerequisites of this project.
         </p>
         <button
           onClick={handleAnalyze}
           disabled={analyzing}
-          className="w-fit flex items-center justify-between gap-6 py-4 px-8 bg-[#011F5B] hover:bg-[#001033] text-white text-[13px] font-bold uppercase tracking-widest rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed font-sans"
+          className="w-fit flex items-center justify-between gap-6 py-3 px-8 border-[0.5px] border-[#011F5B]/30 bg-transparent hover:bg-slate-50 text-[#011F5B] text-[10px] uppercase tracking-[0.2em] rounded-full transition-all duration-500 disabled:opacity-50 disabled:cursor-not-allowed font-sans"
         >
           {analyzing ? (
              <>
-               <div className="w-4 h-4 border-[2px] border-white/30 border-t-white rounded-full animate-spin"></div>
-               Calibrating Array...
+               <div className="w-3 h-3 border-[0.5px] border-[#011F5B]/30 border-t-[#011F5B] rounded-full animate-spin"></div>
+               Calibrating Array
              </>
           ) : 'Run Calibration'}
         </button>
@@ -404,16 +415,16 @@ function SkillAnalyzer({ opportunityId }: SkillAnalyzerProps) {
 
   return (
     <div className="animate-in fade-in duration-700 w-full">
-      <div className="flex flex-wrap items-end gap-6 mb-8 pb-8 border-b-[0.5px] border-gray-200">
-        <div className={`text-6xl sm:text-7xl font-serif tracking-tight leading-none ${result.match_score >= 80 ? 'text-[#011F5B]' :
+      <div className="flex flex-wrap items-end gap-6 mb-8 pb-8 border-b-[0.5px] border-gray-100">
+        <div className={`text-6xl sm:text-7xl font-serif tracking-tight leading-none font-light ${result.match_score >= 80 ? 'text-[#011F5B]' :
             result.match_score >= 60 ? 'text-gray-700' :
               result.match_score >= 40 ? 'text-gray-500' : 'text-gray-300'
           }`}>
           {result.match_score}%
         </div>
         <div className="pb-1 sm:pb-2">
-          <p className="font-sans font-semibold uppercase tracking-[0.25em] text-[11px] text-gray-400 mb-2 block">Match Score</p>
-          <p className="font-sans text-[18px] sm:text-[20px] font-medium text-gray-900 tracking-wide">
+          <p className="font-sans font-medium uppercase tracking-[0.25em] text-[8px] text-gray-400 mb-2 block">Match Score</p>
+          <p className="font-sans text-[16px] font-light text-gray-800 tracking-wide">
             {result.match_score >= 80 ? 'Exceptional Fit' :
               result.match_score >= 60 ? 'Strong Candidate' :
                 result.match_score >= 40 ? 'Moderate Fit' : 'Low Compatibility'}
@@ -421,14 +432,14 @@ function SkillAnalyzer({ opportunityId }: SkillAnalyzerProps) {
         </div>
       </div>
 
-      <p className="text-[17px] text-gray-700 font-serif leading-[1.8] mb-10" style={{ fontFamily: 'Georgia, serif' }}>{result.analysis_text}</p>
+      <p className="text-[16px] text-gray-700 font-serif font-light leading-[1.85] mb-10" style={{ fontFamily: 'Georgia, serif' }}>{result.analysis_text}</p>
 
       {result.matched_skills.length > 0 && (
-         <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
-           <span className="text-[11px] font-bold uppercase tracking-widest text-[#011F5B] block mb-4 font-sans">Correlated Skills</span>
+         <div className="pt-2">
+           <span className="text-[9px] uppercase tracking-[0.2em] text-[#011F5B]/50 block mb-4 font-sans">Correlated Skills</span>
            <div className="flex flex-wrap gap-2.5">
              {result.matched_skills.map(skill => (
-               <span key={skill} className="px-4 py-2 bg-white border border-gray-200 text-gray-800 text-[12px] font-medium font-sans rounded-lg shadow-sm">
+               <span key={skill} className="px-3 py-1 bg-transparent border-[0.5px] border-[#011F5B]/20 text-[#011F5B]/80 text-[10px] font-light tracking-widest font-sans rounded-full">
                  {skill}
                </span>
              ))}

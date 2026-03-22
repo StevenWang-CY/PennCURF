@@ -201,10 +201,11 @@ export default function Home() {
               <div className="pt-6">
                  <Link
                     href={primaryCTA}
-                    className="inline-flex items-center justify-center px-10 py-4 bg-white text-[#011F5B] rounded-full font-medium tracking-wide transition-all duration-300 hover:bg-gray-50 hover:shadow-[0_0_40px_rgba(255,255,255,0.15)] hover:-translate-y-1"
+                    className="group inline-flex items-center justify-center px-10 py-4 bg-white text-[#011F5B] rounded-full font-medium tracking-wide transition-all duration-300 hover:bg-gray-50 hover:shadow-[0_0_40px_rgba(255,255,255,0.15)] hover:-translate-y-1"
                   >
                     <span className="flex items-center gap-2">
                       Get Started
+                      <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
                     </span>
                   </Link>
               </div>
