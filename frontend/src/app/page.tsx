@@ -117,13 +117,14 @@ export default function Home() {
                   </div>
 
                   {/* Feature 2 (Accent) */}
-                  <div className="md:col-span-1 relative group bento-shadow bg-[#011F5B] text-white rounded-[2rem] p-10 overflow-hidden transition-all duration-300 hover:shadow-[0_8px_30px_rgba(1,31,91,0.15)] flex flex-col justify-between">
-                     <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center text-white backdrop-blur-md border border-white/10">
+                  <div className="md:col-span-1 relative group bento-shadow bg-gradient-to-br from-blue-50/80 to-indigo-50/30 rounded-[2rem] p-10 border border-blue-100/50 transition-all duration-300 hover:shadow-[0_8px_30px_rgba(1,31,91,0.06)] overflow-hidden flex flex-col justify-between">
+                     <div className="absolute top-0 right-0 w-32 h-32 bg-blue-100/40 rounded-full mix-blend-multiply blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"></div>
+                     <div className="relative z-10 w-12 h-12 rounded-xl bg-white flex items-center justify-center text-[#011F5B] border border-blue-100/50 shadow-sm">
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
                      </div>
-                     <div>
-                        <h3 className="text-xl font-medium mb-2 text-white">Smart Generation</h3>
-                        <p className="text-blue-100/80 font-light text-sm leading-relaxed">Draft highly tailored, professional outreach emails with absolute precision.</p>
+                     <div className="relative z-10 mt-8">
+                        <h3 className="text-xl font-medium mb-2 text-[#011F5B]">Smart Generation</h3>
+                        <p className="text-gray-500 font-light text-sm leading-relaxed">Draft highly tailored, professional outreach emails with absolute precision.</p>
                      </div>
                   </div>
 
@@ -189,19 +190,19 @@ export default function Home() {
         </section>
 
         {/* --- MINIMAL CTA FOOTER --- */}
-        <section className="relative w-full py-32 px-4 sm:px-6 lg:px-8 bg-[#011F5B] text-white flex flex-col justify-center items-center text-center">
+        <section className="relative w-full py-32 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[#fafafa] to-blue-50/40 text-[#011F5B] flex flex-col justify-center items-center text-center">
            <div className="max-w-3xl mx-auto space-y-10 flex-1 flex flex-col justify-center w-full pb-16">
-              <h2 className="text-4xl sm:text-5xl font-serif tracking-tight text-white/95">
+              <h2 className="text-4xl sm:text-5xl font-serif tracking-tight text-[#011F5B]">
                  Ready to begin your research?
               </h2>
-              <p className="text-lg text-blue-200/70 font-light max-w-xl mx-auto">
+              <p className="text-lg text-gray-500 font-light max-w-xl mx-auto">
                  Join the premier undergraduate directory at the University of Pennsylvania.
               </p>
               
               <div className="pt-6">
                  <Link
                     href={primaryCTA}
-                    className="group inline-flex items-center justify-center px-10 py-4 bg-white text-[#011F5B] rounded-full font-medium tracking-wide transition-all duration-300 hover:bg-gray-50 hover:shadow-[0_0_40px_rgba(255,255,255,0.15)] hover:-translate-y-1"
+                    className="group inline-flex items-center justify-center px-10 py-4 bg-[#011F5B] text-white rounded-full font-medium tracking-wide transition-all duration-300 hover:bg-[#001033] hover:shadow-[0_8px_30px_rgba(1,31,91,0.2)] hover:-translate-y-1"
                   >
                     <span className="flex items-center gap-2">
                       Get Started
@@ -212,12 +213,12 @@ export default function Home() {
            </div>
 
            {/* Footer Anchor */}
-           <div className="relative z-10 w-full max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center text-blue-200/50 text-xs px-6 gap-6 pt-16 border-t border-white/10 mt-auto">
+           <div className="relative z-10 w-full max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center text-gray-400 text-xs px-6 gap-6 pt-16 border-t border-gray-200 mt-auto">
              <span className="font-light tracking-wide">© 2026 Penn CURF Finder</span>
              <div className="flex gap-8 font-light tracking-wide">
-               <Link href="/privacy" className="hover:text-white transition-colors duration-300">Privacy Policy</Link>
-               <Link href="/terms" className="hover:text-white transition-colors duration-300">Terms of Service</Link>
-               <Link href="/contact" className="hover:text-white transition-colors duration-300">Support & Contact</Link>
+               <Link href="/privacy" className="hover:text-[#011F5B] transition-colors duration-300">Privacy Policy</Link>
+               <Link href="/terms" className="hover:text-[#011F5B] transition-colors duration-300">Terms of Service</Link>
+               <Link href="/contact" className="hover:text-[#011F5B] transition-colors duration-300">Support & Contact</Link>
              </div>
            </div>
         </section>
