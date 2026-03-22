@@ -117,14 +117,18 @@ export default function Home() {
                   </div>
 
                   {/* Feature 2 (Accent) */}
-                  <div className="md:col-span-1 relative group bento-shadow bg-gradient-to-br from-blue-50/80 to-indigo-50/30 rounded-[2rem] p-10 border border-blue-100/50 transition-all duration-300 hover:shadow-[0_8px_30px_rgba(1,31,91,0.06)] overflow-hidden flex flex-col justify-between">
-                     <div className="absolute top-0 right-0 w-32 h-32 bg-blue-100/40 rounded-full mix-blend-multiply blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"></div>
-                     <div className="relative z-10 w-12 h-12 rounded-xl bg-white flex items-center justify-center text-[#011F5B] border border-blue-100/50 shadow-sm">
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                  <div className="md:col-span-1 relative group bento-shadow bg-gradient-to-b from-[#01194A] to-[#000d2b] rounded-[2rem] p-10 overflow-hidden transition-all duration-500 hover:shadow-[0_12px_40px_rgba(1,31,91,0.25)] hover:-translate-y-1 flex flex-col justify-between border border-[#011F5B]/50 hover:border-blue-400/30">
+                     {/* Immersive natural lighting & textures */}
+                     <div className="absolute inset-0 opacity-[0.05] mix-blend-overlay pointer-events-none" style={{backgroundImage: 'url("https://grainy-gradients.vercel.app/noise.svg")'}}></div>
+                     <div className="absolute top-[-30%] right-[-20%] w-[150%] h-[150%] bg-[#990000]/15 rounded-full mix-blend-screen blur-[80px] opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none"></div>
+                     <div className="absolute bottom-[-10%] left-[-10%] w-48 h-48 bg-blue-400/20 rounded-full mix-blend-screen blur-[60px] pointer-events-none"></div>
+
+                     <div className="relative z-10 w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center text-blue-100 backdrop-blur-xl border border-white/10 group-hover:border-blue-300/30 transition-colors">
+                        <svg className="w-5 h-5 drop-shadow-[0_0_15px_rgba(191,219,254,0.5)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
                      </div>
                      <div className="relative z-10 mt-8">
-                        <h3 className="text-xl font-medium mb-2 text-[#011F5B]">Smart Generation</h3>
-                        <p className="text-gray-500 font-light text-sm leading-relaxed">Draft highly tailored, professional outreach emails with absolute precision.</p>
+                        <h3 className="text-xl font-serif tracking-tight text-white mb-2 group-hover:text-blue-50 transition-colors">Smart Generation</h3>
+                        <p className="text-blue-200/60 font-light text-sm leading-relaxed group-hover:text-blue-200/80 transition-colors">Draft highly tailored, professional outreach emails with exquisite precision and absolute semantic grace.</p>
                      </div>
                   </div>
 
@@ -189,36 +193,48 @@ export default function Home() {
            </div>
         </section>
 
-        {/* --- MINIMAL CTA FOOTER --- */}
-        <section className="relative w-full py-32 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[#fafafa] to-blue-50/40 text-[#011F5B] flex flex-col justify-center items-center text-center">
-           <div className="max-w-3xl mx-auto space-y-10 flex-1 flex flex-col justify-center w-full pb-16">
-              <h2 className="text-4xl sm:text-5xl font-serif tracking-tight text-[#011F5B]">
-                 Ready to begin your research?
-              </h2>
-              <p className="text-lg text-gray-500 font-light max-w-xl mx-auto">
-                 Join the premier undergraduate directory at the University of Pennsylvania.
-              </p>
+        {/* --- ARTISTIC PREMIUM CTA FOOTER --- */}
+        <section className="relative w-full py-36 px-4 sm:px-6 lg:px-8 bg-[#00143a] overflow-hidden flex flex-col justify-center items-center text-center">
+           
+           {/* Immersive Atmospheric Lighting */}
+           <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-blue-400/20 to-transparent"></div>
+           <div className="absolute top-[-50%] left-[-10%] w-[70vw] h-[70vw] max-w-[800px] max-h-[800px] bg-blue-500/10 rounded-full mix-blend-screen filter blur-[120px] pointer-events-none transform -rotate-12"></div>
+           <div className="absolute bottom-[-50%] right-[-10%] w-[60vw] h-[60vw] max-w-[700px] max-h-[700px] bg-[#990000]/15 rounded-full mix-blend-screen filter blur-[140px] pointer-events-none -rotate-12"></div>
+           <div className="absolute inset-0 opacity-[0.04] mix-blend-overlay pointer-events-none" style={{backgroundImage: 'url("https://grainy-gradients.vercel.app/noise.svg")'}}></div>
+
+           <div className="relative z-10 max-w-3xl mx-auto space-y-12 flex-1 flex flex-col justify-center w-full pb-16">
               
-              <div className="pt-6">
+              <div className="space-y-6">
+                 <h2 className="text-5xl sm:text-6xl lg:text-[4.5rem] font-serif tracking-tight leading-[1.05] text-white drop-shadow-lg">
+                    Ready to begin <br/>
+                    <span className="font-light italic text-blue-100/90">your research?</span>
+                 </h2>
+                 <p className="text-xl text-blue-200/60 font-light max-w-xl mx-auto tracking-wide">
+                    Join the premier undergraduate directory at the University of Pennsylvania.
+                 </p>
+              </div>
+              
+              <div className="pt-8">
                  <Link
                     href={primaryCTA}
-                    className="group inline-flex items-center justify-center px-10 py-4 bg-[#011F5B] text-white rounded-full font-medium tracking-wide transition-all duration-300 hover:bg-[#001033] hover:shadow-[0_8px_30px_rgba(1,31,91,0.2)] hover:-translate-y-1"
+                    className="group relative inline-flex items-center justify-center px-12 py-5 bg-white/5 backdrop-blur-md text-white border border-white/20 rounded-full font-medium tracking-widest uppercase text-[10px] transition-all duration-500 hover:bg-white/10 hover:border-white/40 hover:shadow-[0_0_40px_rgba(255,255,255,0.1)] hover:-translate-y-1 overflow-hidden"
                   >
-                    <span className="flex items-center gap-2">
-                      Get Started
-                      <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full"></div>
+                    <span className="relative z-10 flex items-center gap-3">
+                      Initialize Experience
+                      <svg className="w-4 h-4 transition-transform duration-500 group-hover:translate-x-1.5 opacity-70 group-hover:opacity-100" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
                     </span>
                   </Link>
               </div>
            </div>
 
            {/* Footer Anchor */}
-           <div className="relative z-10 w-full max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center text-gray-400 text-xs px-6 gap-6 pt-16 border-t border-gray-200 mt-auto">
-             <span className="font-light tracking-wide">© 2026 Penn CURF Finder</span>
-             <div className="flex gap-8 font-light tracking-wide">
-               <Link href="/privacy" className="hover:text-[#011F5B] transition-colors duration-300">Privacy Policy</Link>
-               <Link href="/terms" className="hover:text-[#011F5B] transition-colors duration-300">Terms of Service</Link>
-               <Link href="/contact" className="hover:text-[#011F5B] transition-colors duration-300">Support & Contact</Link>
+           <div className="relative z-10 w-full max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center text-blue-200/30 text-[11px] uppercase tracking-[0.2em] px-6 gap-8 pt-16 border-t border-white/5 mt-auto">
+             <span className="font-light">© 2026 Penn CURF Finder</span>
+             <div className="flex gap-8 font-light">
+               <Link href="/privacy" className="hover:text-white transition-colors duration-500">Privacy Policy</Link>
+               <Link href="/terms" className="hover:text-white transition-colors duration-500">Terms of Service</Link>
+               <Link href="/contact" className="hover:text-white transition-colors duration-500">Support & Contact</Link>
              </div>
            </div>
         </section>
