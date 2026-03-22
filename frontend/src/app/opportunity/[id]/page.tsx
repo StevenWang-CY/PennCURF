@@ -55,11 +55,6 @@ function OpportunityDetailContent({ params }: PageProps) {
   const [generatedEmail, setGeneratedEmail] = useState<{ subject: string; body: string } | null>(null);
   const [copied, setCopied] = useState<'email' | 'subject' | 'body' | null>(null);
 
-  /* Interactive Email Revision State */
-  const [revisionMode, setRevisionMode] = useState(false);
-  const [revisionInstruction, setRevisionInstruction] = useState('');
-  const [revising, setRevising] = useState(false);
-
   useEffect(() => {
     api.getOpportunity(id)
       .then(opp => {
@@ -72,33 +67,25 @@ function OpportunityDetailContent({ params }: PageProps) {
       });
   }, [id]);
 
-  const handleGenerateEmail = async (isRevision = false) => {
+  const handleGenerateEmail = async () => {
     if (!profileId) {
       alert('Please create a profile first to generate a personalized email.');
       router.push('/profile');
       return;
     }
-    if (isRevision) setRevising(true);
-    else setGeneratingEmail(true);
+    setGeneratingEmail(true);
 
     try {
       const response = await api.generateEmail({
         opportunity_id: id,
         student_profile_id: profileId,
-        custom_instructions: isRevision ? revisionInstruction : undefined,
-        previous_email: isRevision && generatedEmail ? { subject: generatedEmail.subject, body: generatedEmail.body } : undefined
       });
       setGeneratedEmail({ subject: response.subject, body: response.body });
-      if (isRevision) {
-        setRevisionMode(false);
-        setRevisionInstruction('');
-      }
     } catch (err) {
       console.error('Error generating email:', err);
       alert('Error generating email. Please try again.');
     } finally {
       setGeneratingEmail(false);
-      setRevising(false);
     }
   };
 
@@ -110,17 +97,17 @@ function OpportunityDetailContent({ params }: PageProps) {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-[#011F5B]"></div>
+      <div className="flex justify-center items-center min-h-screen bg-white">
+        <div className="w-8 h-8 border-[2px] border-gray-100 border-t-gray-800 rounded-full animate-spin"></div>
       </div>
     );
   }
 
   if (!opportunity) {
     return (
-      <div className="text-center py-40">
-        <h1 className="text-4xl font-serif text-gray-900 mb-6">Opportunity Not Found</h1>
-        <Link href="/search" className="text-[#011F5B] hover:opacity-70 transition-opacity border-b border-[#011F5B]">
+      <div className="text-center py-40 bg-white min-h-screen flex flex-col items-center justify-center">
+        <h1 className="text-2xl font-serif text-gray-900 mb-6">Opportunity Not Found</h1>
+        <Link href="/search" className="text-xs font-semibold uppercase tracking-[0.2em] text-gray-500 hover:text-gray-900 transition-colors duration-300">
           Return to directory
         </Link>
       </div>
@@ -128,46 +115,43 @@ function OpportunityDetailContent({ params }: PageProps) {
   }
 
   return (
-    <div className="relative min-h-screen bg-white text-[#1e293b]">
-      {/* Background */}
-      <div className="fixed inset-0 overflow-hidden z-0 pointer-events-none opacity-40">
-        <div className="absolute top-[-10%] right-[-5%] w-[800px] h-[800px] bg-blue-50/50 rounded-full mix-blend-multiply filter blur-[120px] animate-blob"></div>
-      </div>
-
-      <div className="relative z-10 max-w-5xl mx-auto px-6 py-20 md:py-32">
+    <div className="min-h-screen bg-white text-[#333333] selection:bg-gray-200 selection:text-black">
+      <div className="max-w-[70rem] mx-auto px-6 sm:px-12 py-16 md:py-24">
+        
         {/* Navigation */}
         <div className="mb-24">
           <button
             onClick={() => router.back()}
-            className="group flex items-center gap-2 text-sm font-bold uppercase tracking-widest font-sans text-gray-600 hover:text-[#011F5B] transition-colors"
+            className="group flex items-center gap-4 text-[10px] font-semibold uppercase tracking-[0.25em] font-sans text-gray-400 hover:text-gray-900 transition-colors duration-300"
           >
-            <svg className="w-4 h-4 transform group-hover:-translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
-            Research Directory
+            <span className="w-8 h-[1px] bg-gray-300 group-hover:bg-gray-900 transition-colors duration-300 block"></span>
+            Back to Directory
           </button>
         </div>
 
-        {/* Editorial Header */}
-        <header className="mb-32 max-w-4xl">
-          <div className="flex flex-wrap gap-3 mb-8">
+        {/* Hyper-Editorial Header */}
+        <header className="mb-20 max-w-4xl border-b border-gray-100 pb-12">
+          <div className="flex flex-wrap gap-2 mb-8">
             {opportunity.is_paid && (
-              <span className="px-3 py-1 border border-gray-200 text-[#011F5B] text-xs font-bold uppercase tracking-widest font-sans rounded-full bg-transparent">
+              <span className="px-3 py-1 border-[0.5px] border-gray-300 text-gray-700 bg-white text-[10px] font-semibold uppercase tracking-widest font-sans rounded-full">
                 Paid Position
               </span>
             )}
             {opportunity.research_categories?.map(cat => (
-              <span key={cat} className="px-3 py-1 border border-gray-200 text-gray-700 text-xs font-bold uppercase tracking-widest font-sans rounded-full bg-transparent">
+              <span key={cat} className="px-3 py-1 border-[0.5px] border-gray-200 text-gray-600 bg-white text-[10px] font-semibold uppercase tracking-widest font-sans rounded-full">
                 {cat}
               </span>
             ))}
           </div>
 
-          <h1 className="font-serif text-4xl md:text-6xl lg:text-7xl leading-[0.95] md:leading-[0.9] tracking-tight text-[#011F5B] mb-12">
+          <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl leading-[1.1] text-gray-900 mb-6 max-w-4xl tracking-tight">
             {opportunity.title}
           </h1>
 
-          <div className="flex items-center gap-4 text-lg md:text-xl  text-gray-800">
-            {opportunity.researcher_name && <span className="text-gray-900 font-medium border-b border-gray-300 pb-0.5">{opportunity.researcher_name}</span>}
-            {opportunity.researcher_title && <span className="text-gray-700">{opportunity.researcher_title}</span>}
+          <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-4 text-lg text-gray-700">
+            {opportunity.researcher_name && <span className="font-medium text-gray-900">{opportunity.researcher_name}</span>}
+            {opportunity.researcher_name && opportunity.researcher_title && <span className="hidden sm:inline text-gray-300">|</span>}
+            {opportunity.researcher_title && <span>{opportunity.researcher_title}</span>}
           </div>
         </header>
 
@@ -176,177 +160,175 @@ function OpportunityDetailContent({ params }: PageProps) {
 
           {/* Left Column: Main Text */}
           <div className="lg:col-span-8 space-y-24">
+            
             {opportunity.description && (
-              <section>
-                <h3 className="text-sm font-bold uppercase tracking-widest font-sans text-gray-600 mb-8 flex items-center gap-3">
-                  <span className="w-8 h-[1px] bg-gray-300"></span> Project Overview
-                </h3>
-                <div className="prose prose-lg md:prose-xl  text-gray-800 leading-[1.8] max-w-none">
-                  <p className="whitespace-pre-wrap">{opportunity.description}</p>
+              <section className="relative">
+                <div className="flex items-center gap-4 mb-6">
+                  <span className="w-8 h-[1px] bg-gray-300"></span>
+                  <h3 className="text-[11px] font-bold uppercase tracking-widest font-sans text-gray-500">Project Overview</h3>
+                </div>
+                <div className="text-[17px] text-gray-800 leading-[1.9] text-justify max-w-[65ch] whitespace-pre-wrap">
+                  {opportunity.description}
                 </div>
               </section>
             )}
 
             {opportunity.mentor_areas && (
-              <section>
-                <h3 className="text-sm font-bold uppercase tracking-widest font-sans text-gray-600 mb-8 flex items-center gap-3">
-                  <span className="w-8 h-[1px] bg-gray-300"></span> Research Areas
-                </h3>
-                <div className="prose prose-lg  text-gray-800 leading-[1.8]">
+              <section className="relative">
+                <div className="flex items-center gap-4 mb-6">
+                  <span className="w-8 h-[1px] bg-gray-300"></span>
+                  <h3 className="text-[11px] font-bold uppercase tracking-widest font-sans text-gray-500">Research Areas</h3>
+                </div>
+                <div className="text-[17px] text-gray-800 leading-[1.9] text-justify max-w-[65ch]">
                   {opportunity.mentor_areas}
                 </div>
               </section>
             )}
 
             {opportunity.preferred_qualifications && cleanScrapedText(opportunity.preferred_qualifications) && (
-              <section>
-                <h3 className="text-sm font-bold uppercase tracking-widest font-sans text-gray-700 mb-8 flex items-center gap-3">
-                  <span className="w-8 h-[1px] bg-gray-300"></span> Qualifications
-                </h3>
-                <div className="prose prose-lg  text-gray-700 leading-[1.8] whitespace-pre-wrap">
+              <section className="relative">
+                <div className="flex items-center gap-4 mb-6">
+                  <span className="w-8 h-[1px] bg-gray-300"></span>
+                  <h3 className="text-[11px] font-bold uppercase tracking-widest font-sans text-gray-500">Qualifications</h3>
+                </div>
+                <div className="text-[17px] text-gray-800 leading-[1.9] text-justify max-w-[65ch] whitespace-pre-wrap">
                   {cleanScrapedText(opportunity.preferred_qualifications)}
                 </div>
               </section>
             )}
 
-            {/* Skill Compatibility Section */}
-            <section className="pt-12 border-t border-gray-200">
-              <h3 className="text-sm font-bold uppercase tracking-widest font-sans text-gray-700 mb-8 flex items-center gap-3">
-                <span className="w-8 h-[1px] bg-gray-300"></span> Fit Analysis
-              </h3>
-
-              <div className="bg-gray-50 rounded-3xl p-8 border border-gray-200 relative overflow-hidden group">
-                <div className="relative z-10">
-                  <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-                    <div>
-                      <h4 className="font-serif text-2xl text-[#011F5B] mb-2">Am I a good fit?</h4>
-                      <p className="text-gray-800">Instantly analyze your compatibility based on your profile.</p>
-                    </div>
-                  </div>
-                  <SkillAnalyzer opportunityId={id} />
-                </div>
+            {/* Seamless, Minimal Fit Analysis */}
+            <section className="relative border-t border-gray-100 pt-16">
+              <div className="flex items-center gap-4 mb-8">
+                <span className="w-8 h-[1px] bg-[#011F5B]/30"></span>
+                <h3 className="text-[11px] font-bold uppercase tracking-widest font-sans text-[#011F5B]">Compatibility Analysis</h3>
+              </div>
+              
+              <div className="max-w-[65ch]">
+                 <SkillAnalyzer opportunityId={id} />
               </div>
             </section>
 
-            {/* Email Generator Section */}
-            <section className="pt-12 border-t border-gray-200">
-              <h3 className="text-sm font-bold uppercase tracking-widest font-sans text-gray-700 mb-8 flex items-center gap-3">
-                <span className="w-8 h-[1px] bg-gray-300"></span> Email Draft
-              </h3>
+            {/* Seamless, Minimal Email Generation */}
+            <section className="relative border-t border-gray-100 pt-16">
+              <div className="flex items-center gap-4 mb-8">
+                <span className="w-8 h-[1px] bg-[#011F5B]/30"></span>
+                <h3 className="text-[11px] font-bold uppercase tracking-widest font-sans text-[#011F5B]">Outreach Protocol</h3>
+              </div>
 
-              <div className="bg-gray-50 rounded-3xl p-8 border border-gray-200 relative overflow-hidden group">
-                <div className="relative z-10">
-                  <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-                    <div>
-                      <h4 className="font-serif text-2xl text-[#011F5B] mb-2">Ready to Apply?</h4>
-                      <p className="text-gray-800 ">Draft a professional email to Dr. {opportunity.researcher_name?.split(' ').pop()} instantly.</p>
+               <div className="max-w-[65ch]">
+                 {!generatedEmail ? (
+                    <div className="flex flex-col sm:flex-row items-baseline gap-6 border border-gray-100 bg-gray-50/50 p-6 rounded-2xl">
+                      <p className="text-[15px] text-gray-600 flex-1 leading-relaxed">
+                        Use your established profile vector to automatically generate a precise outreach email to the investigator.
+                      </p>
+                      {hasProfile ? (
+                        <button
+                          onClick={() => handleGenerateEmail()}
+                          disabled={generatingEmail}
+                          className="px-6 py-2.5 bg-white border border-[#011F5B] text-[#011F5B] text-[11px] font-bold uppercase tracking-widest font-sans hover:bg-[#011F5B] hover:text-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed rounded-full whitespace-nowrap"
+                        >
+                          {generatingEmail ? 'Drafting...' : 'Generate Draft'}
+                        </button>
+                      ) : (
+                        <Link href="/profile" className="px-6 py-2.5 bg-white border border-gray-300 text-gray-700 text-[11px] font-bold uppercase tracking-widest font-sans hover:bg-gray-50 transition-colors rounded-full whitespace-nowrap">
+                          Create Profile
+                        </Link>
+                      )}
                     </div>
-                    {!generatedEmail && !hasProfile && (
-                      <Link href="/profile" className="px-5 py-2.5 bg-white border border-gray-200 text-[#011F5B] font-bold rounded-lg hover:bg-blue-50 transition text-sm shadow-sm">
-                        Create Profile
-                      </Link>
-                    )}
-                  </div>
-
-                  {!generatedEmail ? (
-                    <button
-                      onClick={() => handleGenerateEmail(false)}
-                      disabled={generatingEmail || !hasProfile}
-                      className="w-full py-4 bg-[#011F5B] text-white rounded-xl font-bold text-lg hover:shadow-xl hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 shadow-lg shadow-blue-900/10"
-                    >
-                      {generatingEmail ? 'Drafting...' : 'Generate Email Draft'}
-                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
-                    </button>
                   ) : (
-                    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4">
-                      {/* Email Preview */}
-                      <div className="space-y-4">
-                        <div className="border-b border-gray-200 pb-4">
-                          <p className="text-sm font-bold uppercase tracking-widest font-sans text-gray-700 mb-1">Subject</p>
-                          <div className="flex justify-between items-center bg-white p-3 rounded-lg border border-gray-200">
-                            <p className="font-medium text-gray-900 truncate pr-2">{generatedEmail.subject}</p>
-                            <button onClick={() => copyToClipboard(generatedEmail.subject, 'subject')} className="text-xs text-[#011F5B] font-bold hover:underline shrink-0">
-                              {copied === 'subject' ? 'Copied' : 'Copy'}
-                            </button>
-                          </div>
-                        </div>
-                        <div>
-                          <p className="text-sm font-bold uppercase tracking-widest font-sans text-gray-700 mb-2">Body</p>
-                          <div className="relative">
+                    <div className="space-y-10 animate-in fade-in duration-700">
+                      <div className="space-y-8">
+                         <div>
+                            <span className="text-[10px] font-bold uppercase tracking-[0.2em] font-sans text-gray-400 block mb-3">Subject</span>
+                            <div className="font-mono text-[14px] text-gray-900 bg-gray-50/50 px-5 py-4 border-[0.5px] border-gray-200 flex justify-between items-center group rounded-xl">
+                               <span>{generatedEmail.subject}</span>
+                               <button onClick={() => copyToClipboard(generatedEmail.subject, 'subject')} className="text-[10px] uppercase tracking-widest text-[#011F5B] opacity-0 group-hover:opacity-100 transition-opacity font-bold">
+                                 {copied === 'subject' ? 'Copied' : 'Copy'}
+                               </button>
+                            </div>
+                         </div>
+                         
+                         <div>
+                            <div className="flex items-baseline justify-between mb-3">
+                               <span className="text-[10px] font-bold uppercase tracking-[0.2em] font-sans text-gray-400 block">Body</span>
+                               <button onClick={() => copyToClipboard(generatedEmail.body, 'body')} className="text-[10px] uppercase tracking-widest text-[#011F5B] hover:underline font-bold transition-opacity">
+                                 {copied === 'body' ? 'Copied' : 'Copy Body'}
+                               </button>
+                            </div>
                             <textarea
                               value={generatedEmail.body}
                               onChange={e => setGeneratedEmail({ ...generatedEmail, body: e.target.value })}
-                              className="w-full min-h-[300px] bg-white border border-gray-200 rounded-xl p-6 font-mono text-sm text-gray-800 focus:ring-2 focus:ring-[#011F5B]/10 outline-none leading-relaxed resize-y shadow-sm"
+                              className="w-full min-h-[400px] bg-transparent border-[0.5px] border-gray-200 p-6 font-mono text-[14px] text-gray-800 focus:outline-none focus:border-gray-400 leading-[1.8] resize-y transition-colors rounded-xl"
                             />
-                            <button onClick={() => copyToClipboard(generatedEmail.body, 'body')} className="absolute top-4 right-4 text-xs bg-gray-100 hover:bg-gray-200 px-3 py-1 rounded text-gray-800 font-medium transition">
-                              {copied === 'body' ? 'Copied' : 'Copy Body'}
-                            </button>
-                          </div>
-                        </div>
+                         </div>
                       </div>
 
-                      {/* Controls */}
-                      <div className="flex flex-wrap gap-3 pt-2">
-                        <button onClick={() => copyToClipboard(`Subject: ${generatedEmail.subject}\n\n${generatedEmail.body}`, 'body')} className="flex-1 px-6 py-3 bg-[#011F5B] text-white font-bold rounded-lg hover:shadow-lg transition text-sm">
-                          Copy Full Email
+                      <div className="flex flex-wrap items-center gap-4 border-t border-gray-100 pt-6">
+                        <button onClick={() => copyToClipboard(`Subject: ${generatedEmail.subject}\n\n${generatedEmail.body}`, 'body')} className="px-6 py-2 border border-[#011F5B] bg-[#011F5B] text-white text-[11px] font-bold uppercase tracking-widest rounded-full transition-colors hover:bg-[#001033]">
+                          Copy Full Payload
                         </button>
-                        <button onClick={() => handleGenerateEmail(false)} className="px-6 py-3 bg-white border border-gray-200 text-gray-700 font-bold rounded-lg hover:bg-gray-50 transition text-sm">
+                        <button onClick={() => handleGenerateEmail()} className="px-6 py-2 border border-gray-300 bg-transparent text-gray-700 text-[11px] font-bold uppercase tracking-widest rounded-full transition-colors hover:bg-gray-50">
                           Regenerate
                         </button>
                       </div>
                     </div>
                   )}
-                </div>
-              </div>
+               </div>
             </section>
           </div>
 
-          {/* Right Column: Metadata & Tools */}
-          <div className="lg:col-span-4 space-y-16 lg:sticky lg:top-24 h-fit">
-            {/* Contact Info (Clean) */}
+          {/* Right Column: Metadata */}
+          <div className="lg:col-span-4 space-y-16 h-fit pt-2 lg:pt-0">
+            
+            {/* Contact Info */}
             <div className="space-y-6">
-              <h3 className="text-sm font-bold uppercase tracking-widest font-sans text-gray-700">Researcher Contact</h3>
-              <div className="space-y-2">
+              <h3 className="text-[11px] font-bold uppercase tracking-widest font-sans text-gray-500 block mb-4">Researcher Contact</h3>
+              
+              <div className="space-y-5">
                 {opportunity.researcher_email ? (
                   <div className="group flex items-center gap-3">
-                    <span className="font-mono text-sm text-[#011F5B] border-b border-gray-200 pb-0.5">{opportunity.researcher_email}</span>
-                    <button onClick={() => copyToClipboard(opportunity.researcher_email!, 'email')} className="opacity-0 group-hover:opacity-100 transition-opacity text-gray-700 hover:text-[#011F5B]">
-                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+                    <span className="font-mono text-[14px] text-[#011F5B] border-b-[0.5px] border-[#011F5B]/30 hover:border-[#011F5B] transition-colors cursor-text pb-0.5">
+                       {opportunity.researcher_email}
+                    </span>
+                    <button onClick={() => copyToClipboard(opportunity.researcher_email!, 'email')} className="opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-[#011F5B]">
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
                     </button>
                   </div>
-                ) : <span className="text-gray-700 italic">No email listed</span>}
+                ) : <span className="text-gray-500 italic text-[15px]">No email listed</span>}
 
-                <div className="flex flex-col gap-2 pt-4">
+                <div className="flex flex-col gap-3 pt-4">
                   {isValidUrl(opportunity.researcher_profile_url) && (
-                    <a href={opportunity.researcher_profile_url!} target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-gray-900 hover:text-[#011F5B] transition-colors flex items-center gap-2">
-                      CURF Profile <span className="text-gray-600">↗</span>
+                    <a href={opportunity.researcher_profile_url!} target="_blank" rel="noopener noreferrer" className="group text-[14px] font-medium text-gray-800 hover:text-[#011F5B] transition-colors flex items-center w-max gap-1">
+                      CURF Profile <span className="text-gray-400 font-sans font-normal group-hover:text-[#011F5B] transition-colors ml-1">↗</span>
                     </a>
                   )}
                   {isValidUrl(opportunity.department_page_url) && (
-                    <a href={opportunity.department_page_url!} target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-gray-900 hover:text-[#011F5B] transition-colors flex items-center gap-2">
-                      Department Page <span className="text-gray-600">↗</span>
+                    <a href={opportunity.department_page_url!} target="_blank" rel="noopener noreferrer" className="group text-[14px] font-medium text-gray-800 hover:text-[#011F5B] transition-colors flex items-center w-max gap-1">
+                      Department Page <span className="text-gray-400 font-sans font-normal group-hover:text-[#011F5B] transition-colors ml-1">↗</span>
                     </a>
                   )}
                 </div>
               </div>
             </div>
 
-            {/* Requirements Pills */}
-            <div className="space-y-6">
-              <h3 className="text-sm font-bold uppercase tracking-widest font-sans text-gray-700">Target Students</h3>
+            {/* Target Students */}
+            <div className="space-y-6 pt-12 border-t border-gray-100">
+              <h3 className="text-[11px] font-bold uppercase tracking-widest font-sans text-gray-500 block mb-4">Target Students</h3>
               <div className="flex flex-wrap gap-2">
                 {opportunity.preferred_student_years?.map(y => (
-                  <span key={y} className="px-3 py-1 border border-gray-200 text-gray-700 text-xs font-bold uppercase tracking-widest font-sans rounded-full">
+                  <span key={y} className="px-3.5 py-1.5 border-[0.5px] border-gray-300 text-gray-700 bg-white text-[10px] font-semibold uppercase tracking-widest font-sans rounded-full">
                     {y}
                   </span>
                 ))}
                 {opportunity.academic_terms?.map(t => (
-                  <span key={t} className="px-3 py-1 border border-gray-200 text-gray-700 text-xs font-bold uppercase tracking-widest font-sans rounded-full">
+                  <span key={t} className="px-3.5 py-1.5 border-[0.5px] border-gray-300 text-gray-700 bg-white text-[10px] font-semibold uppercase tracking-widest font-sans rounded-full">
                     {t}
                   </span>
                 ))}
               </div>
             </div>
+
           </div>
         </div>
       </div>
@@ -378,58 +360,53 @@ function SkillAnalyzer({ opportunityId }: SkillAnalyzerProps) {
 
   if (!result) {
     return (
-      <button
-        onClick={handleAnalyze}
-        disabled={analyzing}
-        className="w-full py-4 bg-white border border-gray-200 text-[#011F5B] rounded-xl font-bold text-lg hover:bg-gray-50 hover:shadow-lg hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 shadow-sm"
-      >
-        {analyzing ? (
-          <>
-            <div className="w-5 h-5 border-2 border-[#011F5B]/30 border-t-[#011F5B] rounded-full animate-spin"></div>
-            Analyzing...
-          </>
-        ) : (
-          <>
-            Analyze Fit
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
-          </>
-        )}
-      </button>
+      <div className="flex flex-col sm:flex-row items-baseline gap-6 border border-gray-100 bg-gray-50/50 p-6 rounded-2xl">
+        <p className="text-[15px] text-gray-600 flex-1 leading-relaxed">
+          Evaluate your profile vector against the required qualifications for this project.
+        </p>
+        <button
+          onClick={handleAnalyze}
+          disabled={analyzing}
+          className="px-6 py-2.5 bg-white border border-[#011F5B] text-[#011F5B] text-[11px] font-bold uppercase tracking-widest font-sans hover:bg-[#011F5B] hover:text-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed min-w-[150px] flex justify-center rounded-full whitespace-nowrap"
+        >
+          {analyzing ? 'Analyzing...' : 'Execute Analysis'}
+        </button>
+      </div>
     )
   }
 
   return (
-    <div className="animate-in fade-in slide-in-from-bottom-2">
-      <div className="flex items-center gap-4 mb-4">
-        <div className={`text-4xl font-bold ${result.match_score >= 80 ? 'text-emerald-600' :
-            result.match_score >= 60 ? 'text-blue-600' :
-              result.match_score >= 40 ? 'text-yellow-600' : 'text-red-500'
+    <div className="animate-in fade-in duration-700">
+      <div className="flex items-center gap-6 mb-6">
+        <div className={`text-5xl font-serif tracking-tight ${result.match_score >= 80 ? 'text-[#011F5B]' :
+            result.match_score >= 60 ? 'text-gray-800' :
+              result.match_score >= 40 ? 'text-gray-500' : 'text-gray-400'
           }`}>
           {result.match_score}%
         </div>
         <div>
-          <p className="text-sm font-bold uppercase tracking-widest font-sans text-gray-700">Match Score</p>
-          <p className="text-sm font-medium text-gray-900">
-            {result.match_score >= 80 ? 'High Compatibility' :
-              result.match_score >= 60 ? 'Good Fit' :
+          <p className="font-serif text-[18px] text-gray-800 italic">
+            {result.match_score >= 80 ? 'Exceptional Fit' :
+              result.match_score >= 60 ? 'Strong Candidate' :
                 result.match_score >= 40 ? 'Moderate Fit' : 'Low Compatibility'}
           </p>
         </div>
       </div>
-      <p className="text-sm text-gray-800 leading-relaxed mb-6 border-b border-gray-100 pb-4">{result.analysis_text}</p>
 
-      <div className="space-y-4">
-        <div>
-          <p className="text-xs font-bold uppercase tracking-widest font-sans text-[#011F5B] mb-2">Matched Skills</p>
-          <div className="flex flex-wrap gap-1">
-            {result.matched_skills.map(skill => (
-              <span key={skill} className="px-2 py-0.5 bg-blue-50 text-blue-800 text-xs font-bold uppercase tracking-wide rounded border border-blue-100">
-                {skill}
-              </span>
-            ))}
-          </div>
-        </div>
-      </div>
+      <p className="text-[16px] text-gray-800 leading-[1.9] text-justify mb-8">{result.analysis_text}</p>
+
+      {result.matched_skills.length > 0 && (
+         <div className="space-y-4">
+           <span className="text-[10px] font-bold uppercase tracking-widest font-sans text-gray-500 block mb-3">Intersecting Vectors</span>
+           <div className="flex flex-wrap gap-2">
+             {result.matched_skills.map(skill => (
+               <span key={skill} className="px-3.5 py-1.5 border-[0.5px] border-[#011F5B]/30 text-[#011F5B] bg-blue-50/30 text-[10px] font-semibold uppercase tracking-widest font-sans rounded-full">
+                 {skill}
+               </span>
+             ))}
+           </div>
+         </div>
+      )}
     </div>
   );
 }
